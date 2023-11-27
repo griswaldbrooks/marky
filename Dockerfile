@@ -31,6 +31,7 @@ RUN if [ -z "$USER" ]; then echo '\nERROR: USER not set. Run \n\n \texport USER=
 RUN --mount=type=cache,target=/var/cache/apt,id=apt \
   apt-get update && apt-get upgrade -y \
   && apt-get install -q -y --no-install-recommends \
+  clang-format \
   git \
   inkscape \
   neovim \
@@ -44,8 +45,7 @@ RUN --mount=type=cache,target=/var/cache/apt,id=apt \
 
 # install developer tools
 RUN python3 -m pip install --no-cache-dir \
-  pre-commit==3.0.4 \
-  elsie==3.4
+  pre-commit==3.0.4
 
 # install hadolint
 RUN wget -q -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-Linux-x86_64 \
