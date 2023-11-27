@@ -12,14 +12,14 @@ set_target_properties(gmock_main PROPERTIES EXPORT_COMPILE_COMMANDS OFF)
 
 enable_testing()
 
-add_executable(test_spanny
-  test_tooly.cpp
+add_executable(test_landy
+  test_landy.cpp
 )
-target_link_libraries(test_spanny PRIVATE
+target_link_libraries(test_landy PRIVATE
   GTest::gtest_main
   GTest::gmock_main
   landy::landy
 )
 
 include(GoogleTest)
-gtest_discover_tests(test_spanny)
+gtest_discover_tests(test_landy)
