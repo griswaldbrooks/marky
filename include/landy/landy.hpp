@@ -1,10 +1,38 @@
 #pragma once
 #include <optional>
-#include <span>
+#include <cmath>
 namespace landy::geometry {
 
-// this is a point, not a pose
-struct point_t { double x, y, z; };
+template <typename T>
+[[nodiscard]] bool is_near(T const& lhs, T const& rhs, T const& tolerance = 1e-6) {
+  return std::abs(lhs - rhs) < tolerance;
+}
+
+struct point_t {
+  double x = 0.;
+  double y = 0.;
+  double z = 0.;
+};
+
+[[nodiscard]] double norm(point_t const& lhs) {
+  return std::hypot(lhs.x, lhs.y, lhs.z);
+}
+
+point_t operator+(point_t const& lhs, point_t const& rhs) {
+  return {lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z};
+}
+
+point_t operator-(point_t const& lhs, point_t const& rhs) {
+  return {lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z};
+}
+
+[[nodiscard]] bool is_near(point_t const& lhs, point_t const& rhs, double tolerance = 1e-6) {
+  return norm(lhs - rhs) < tolerance;
+}
+
+bool operator==(point_t const& lhs, point_t const& rhs) {
+  return is_near(lhs, rhs);
+}
 
 struct observation_t {
   point_t point;
@@ -13,20 +41,32 @@ struct observation_t {
 };
 
 struct line_t {
-  // are lines for these algorithms represented as two points that are
-  // interpolated, or as coefficients of linear equations? I think the two points
-  point_t p, q;
+  point_t p;
+  point_t q;
 };
 
+point_t cross(point_t const& p, point_t const& q) {
+  return {p.y * q.z - p.z * q.y, p.z * q.x - p.x * q.z, p.x * q.y - p.y * q.x};
+}
+
+double dot(point_t const& p, point_t const& q) {
+  return p.x * q.x + p.y * q.y + p.z * q.z;
+}
+
+bool is_skew(line_t const& a, line_t const& b) {
+  // https://en.wikipedia.org/wiki/Skew_lines#Nearest_points
+  // https://mathforyou.net/en/online/vectors/volume/tetrahedron/
+  auto const volume = dot(a.p - b.p, cross(a.q - a.p, b.q - b.p));
+  return is_near(volume, 0.);
+}
+
+// 3d lines that are neither parallel nor intersecting are called skew lines
+// https://en.wikipedia.org/wiki/Skew_lines#Nearest_points
 // change to std::expected
 std::optional<point_t> closest_point([[maybe_unused]] line_t const& p, [[maybe_unused]] line_t const& q) {
   // check if parallel, return std::unexpected
   // i think the algorithm to check if lines intersect or just get near each
   // is the same?
-  // i've written this before, something to do with the cross product
-  // i think you project one line on to the other (and vice versa?)
-  // which give you the end points, and then you interpolate between those
-  // points with a t = 0.5?
   //
   // there's a special case where the lines overlap in multiple spots?
   // maybe in that case you would use the "normal" intersection algorithm?
