@@ -107,8 +107,8 @@ std::optional<point_t> midpoint(line_t const& a, line_t const& b) {
 *       this is meant to be the precursor to whatever estimator tracks the pose and i'm sure there's a normal
 *       name for this.
 */
-template <size_t N, size_t M>
-[[nodiscard]] point_t compute_pose([[maybe_unused]] std::span<point_t const, N> observations, [[maybe_unused]] std::span<point_t const, M> constellation) {
+// template <size_t N, size_t M>
+// [[nodiscard]] point_t compute_pose([[maybe_unused]] std::span<point_t const, N> observations, [[maybe_unused]] std::span<point_t const, M> constellation) {
   // given a known constellation, just knowing which landmarks are in view isn't enough.
   // for example, if the landmarks allow for unique identification, and nothing else,
   // then just having a subset of the constellation tells you nothing.
@@ -136,7 +136,7 @@ template <size_t N, size_t M>
   //
   //
   //
-  return {};
-}
+  // return {};
+// }
 
 } // geometry

@@ -5,20 +5,20 @@
 namespace landy::geometry {
 
 
-TEST(ComputePose, NoOp) {
-  auto const observations = std::array{//
-    point_t{0, 0, 0}, //
-    point_t{0, 0, 0}, //
-    point_t{0, 0, 0}, //
-  };
-  auto const constellation = std::array{
-    point_t{0, 0, 0}, //
-    point_t{0, 0, 0}, //
-    point_t{0, 0, 0}, //
-  };
-  auto const pose = compute_pose(std::span{observations}, std::span{constellation});
-  EXPECT_TRUE(pose.x == 0.);
-}
+// TEST(ComputePose, NoOp) {
+//   auto const observations = std::array{//
+//     point_t{0, 0, 0}, //
+//     point_t{0, 0, 0}, //
+//     point_t{0, 0, 0}, //
+//   };
+//   auto const constellation = std::array{
+//     point_t{0, 0, 0}, //
+//     point_t{0, 0, 0}, //
+//     point_t{0, 0, 0}, //
+//   };
+//   auto const pose = compute_pose(std::span{observations}, std::span{constellation});
+//   EXPECT_TRUE(pose.x == 0.);
+// }
 
 TEST(Dot, Dot) {
   auto const a = point_t{1, 2, 3};

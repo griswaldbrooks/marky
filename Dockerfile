@@ -51,6 +51,13 @@ RUN python3 -m pip install --no-cache-dir \
 RUN wget -q -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-Linux-x86_64 \
   && chmod +x /bin/hadolint
 
+# install google benchmark
+WORKDIR /opt
+RUN git clone --depth 1 https://github.com/google/benchmark.git \
+  && cd benchmark \
+  && cmake -DCMAKE_BUILD_TYPE=Release -DBENCHMARK_ENABLE_GTEST_TESTS=OFF -S . -B "build" \
+  && cmake --build "build" --config Release --target install
+
 # Setup user home directory
 # --no-log-init helps with excessively long UIDs
 RUN groupadd --gid $GID $USER \
