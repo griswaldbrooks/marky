@@ -2,12 +2,38 @@
 #include <optional>
 #include <cmath>
 #include <utility>
+#include <numbers>
 #include "mp-units/systems/si/si.h"
 #include "mp-units/systems/isq/isq.h"
 #include "mp-units/math.h"
+#include <klein/klein.hpp>
 
 using namespace mp_units;
 using namespace::si::unit_symbols;
+using namespace std::numbers;
+
+kln::point testklein() {
+  // Create a rotor representing a pi/2 rotation about the z-axis
+// Normalization is done automatically
+  auto const r = kln::rotor{pi_v<float> * 0.5f, 0.f, 0.f, 1.f};
+
+// Create a translator that represents a translation of 1 unit
+// in the yz-direction. Normalization is done automatically.
+  auto const t = kln::translator{1.f, 0.f, 1.f, 1.f};
+
+// Create a motor that combines the action of the rotation and
+// translation above.
+  auto const m = r * t;
+
+// Construct a point at position (1, 0, 0)
+  auto const p1 = kln::point{1, 0, 0};
+
+// Apply the motor to the point. This is equivalent to the conjugation
+// operator m * p1 * ~m where * is the geometric product and ~ is the
+// reverse operation.
+  auto const p2 = m(p1);
+  return p2;
+}
 
 namespace landy::geometry {
 
