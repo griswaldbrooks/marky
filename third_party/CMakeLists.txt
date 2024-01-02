@@ -1,2 +1,5 @@
 add_subdirectory(expected)
 add_subdirectory(mdspan)
+add_subdirectory(fmt-10.1.1)
+add_subdirectory(gsl-lite-0.41.0)
+add_subdirectory(mp-units-2.0.0)

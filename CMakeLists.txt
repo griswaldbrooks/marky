@@ -11,6 +11,7 @@ add_library(landy INTERFACE)
 add_library(landy::landy ALIAS landy)
 target_include_directories(landy INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>)
 target_compile_features(landy INTERFACE cxx_std_20)
+target_link_libraries(landy INTERFACE mp-units::mp-units)
 
 add_executable(landy_example
   src/main.cpp
