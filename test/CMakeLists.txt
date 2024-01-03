@@ -14,6 +14,7 @@ enable_testing()
 
 add_executable(test_landy
   test_landy.cpp
+  test_pga.cpp
 )
 target_link_libraries(test_landy PRIVATE
   GTest::gtest_main

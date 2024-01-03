@@ -1,52 +1,46 @@
 #pragma once
+#include <array>
+#include <cmath>
+#include <numbers>
 
 namespace pga {
 
-#include <array>
-#include <cmath>
-#include <stdio.h>
+using namespace std::numbers;
 
-#define PI 3.14159265358979323846
-
-// static const char *basis[] = {"1",    "e0",   "e1",   "e2",   "e3",  "e01",
-//                               "e02",  "e03",  "e12",  "e31",  "e23", "e021",
-//                               "e013", "e032", "e123", "e0123"};
-
-struct PGA3D {
-  // PGA3D() { std::fill(mvec, mvec + sizeof(mvec) / 4, 0.0f); }
-  // PGA3D(double f, int idx = 0) {
-  //   std::fill(mvec, mvec + sizeof(mvec) / 4, 0.0f);
-  //   mvec[idx] = f;
-  // }
-  constexpr double& operator[](size_t idx) { return mvec[idx]; }
-  constexpr double operator[](size_t idx) const { return mvec[idx]; }
-  constexpr PGA3D Conjugate() const;
-  constexpr PGA3D Involute() const;
-  constexpr double norm() const;
-  constexpr double inorm() const;
-  constexpr PGA3D normalized() const;
+struct multivector {
+ template <std::size_t Index>
+    constexpr void set(double value) {
+    static_assert(Index < 16, "Multivectors only have 16 elements");
+        std::get<Index>(elements_) = value;
+    } 
+  constexpr double& operator[](std::size_t idx) { return elements_[idx]; }
+  constexpr double operator[](std::size_t idx) const { return elements_[idx]; }
+  // implements const iterator for the elements 
+  constexpr auto cbegin() const { return elements_.cbegin(); }
+  constexpr auto cend() const { return elements_.cend(); }
+  constexpr auto begin() { return elements_.begin(); }
+  constexpr auto end() { return elements_.end(); }
 
 private:
-  std::array<double, 16> mvec = {};
+  std::array<double, 16> elements_ = {};
 };
 
-constexpr PGA3D make_basis(double value, size_t index) {
-  PGA3D result;
-  result[index] = value;
+template <std::size_t Index>
+constexpr multivector make_vector(double value) {
+  multivector result;
+  result.set<Index>(value);
   return result;
 }
 
-// PGA is plane based. Vectors are planes. (think linear functionals)
-static constexpr auto e0 = make_basis(1., 1);
-static constexpr auto e1 = make_basis(1., 2);
-static constexpr auto e2 = make_basis(1., 3);
-static constexpr auto e3 = make_basis(1., 4);
+constexpr bool operator==(multivector const& a, multivector const& b) {
+  return std::equal(a.cbegin(), a.cend(), b.cbegin(), b.cend());
+}
 //***********************
-// PGA3D.Reverse : res = ~a
+// multivector.Reverse : res = ~a
 // Reverse the order of the basis blades.
 //***********************
-inline constexpr PGA3D operator~(const PGA3D &a) {
-  PGA3D res;
+constexpr multivector operator~(multivector const& a) {
+  multivector res;
   res[0] = a[0];
   res[1] = a[1];
   res[2] = a[2];
@@ -67,11 +61,11 @@ inline constexpr PGA3D operator~(const PGA3D &a) {
 };
 
 //***********************
-// PGA3D.Dual : res = !a
+// multivector.Dual : res = !a
 // Poincare duality operator.
 //***********************
-inline constexpr PGA3D operator!(const PGA3D &a) {
-  PGA3D res;
+constexpr multivector operator!(multivector const&a) {
+  multivector res;
   res[0] = a[15];
   res[1] = a[14];
   res[2] = a[13];
@@ -92,61 +86,61 @@ inline constexpr PGA3D operator!(const PGA3D &a) {
 };
 
 //***********************
-// PGA3D.Conjugate : res = a.Conjugate()
+// multivector.Conjugate : res = a.Conjugate()
 // Clifford Conjugation
 //***********************
-inline constexpr PGA3D PGA3D::Conjugate() const {
-  PGA3D res;
-  res[0] = this->mvec[0];
-  res[1] = -this->mvec[1];
-  res[2] = -this->mvec[2];
-  res[3] = -this->mvec[3];
-  res[4] = -this->mvec[4];
-  res[5] = -this->mvec[5];
-  res[6] = -this->mvec[6];
-  res[7] = -this->mvec[7];
-  res[8] = -this->mvec[8];
-  res[9] = -this->mvec[9];
-  res[10] = -this->mvec[10];
-  res[11] = this->mvec[11];
-  res[12] = this->mvec[12];
-  res[13] = this->mvec[13];
-  res[14] = this->mvec[14];
-  res[15] = this->mvec[15];
+constexpr multivector conjugate(multivector const& a) {
+  multivector res;
+  res[0] = a[0];
+  res[1] = -a[1];
+  res[2] = -a[2];
+  res[3] = -a[3];
+  res[4] = -a[4];
+  res[5] = -a[5];
+  res[6] = -a[6];
+  res[7] = -a[7];
+  res[8] = -a[8];
+  res[9] = -a[9];
+  res[10] = -a[10];
+  res[11] = a[11];
+  res[12] = a[12];
+  res[13] = a[13];
+  res[14] = a[14];
+  res[15] = a[15];
   return res;
 };
 
 //***********************
-// PGA3D.Involute : res = a.Involute()
+// multivector.Involute : res = a.Involute()
 // Main involution
 //***********************
-inline constexpr PGA3D PGA3D::Involute() const {
-  PGA3D res;
-  res[0] = this->mvec[0];
-  res[1] = -this->mvec[1];
-  res[2] = -this->mvec[2];
-  res[3] = -this->mvec[3];
-  res[4] = -this->mvec[4];
-  res[5] = this->mvec[5];
-  res[6] = this->mvec[6];
-  res[7] = this->mvec[7];
-  res[8] = this->mvec[8];
-  res[9] = this->mvec[9];
-  res[10] = this->mvec[10];
-  res[11] = -this->mvec[11];
-  res[12] = -this->mvec[12];
-  res[13] = -this->mvec[13];
-  res[14] = -this->mvec[14];
-  res[15] = this->mvec[15];
+constexpr multivector involute(multivector const& a) {
+  multivector res;
+  res[0] = a[0];
+  res[1] = -a[1];
+  res[2] = -a[2];
+  res[3] = -a[3];
+  res[4] = -a[4];
+  res[5] = a[5];
+  res[6] = a[6];
+  res[7] = a[7];
+  res[8] = a[8];
+  res[9] = a[9];
+  res[10] = a[10];
+  res[11] = -a[11];
+  res[12] = -a[12];
+  res[13] = -a[13];
+  res[14] = -a[14];
+  res[15] = a[15];
   return res;
 };
 
 //***********************
-// PGA3D.Mul : res = a * b
+// multivector.Mul : res = a * b
 // The geometric product.
 //***********************
-inline constexpr PGA3D operator*(const PGA3D &a, const PGA3D &b) {
-  PGA3D res;
+constexpr multivector operator*(multivector const& a, multivector const& b) {
+  multivector res;
   res[0] = b[0] * a[0] + b[2] * a[2] + b[3] * a[3] + b[4] * a[4] - b[8] * a[8] -
            b[9] * a[9] - b[10] * a[10] - b[14] * a[14];
   res[1] = b[1] * a[0] + b[0] * a[1] - b[5] * a[2] - b[6] * a[3] - b[7] * a[4] +
@@ -199,11 +193,11 @@ inline constexpr PGA3D operator*(const PGA3D &a, const PGA3D &b) {
 };
 
 //***********************
-// PGA3D.Wedge : res = a ^ b
+// multivector.Wedge : res = a ^ b
 // The outer product. (MEET)
 //***********************
-inline constexpr PGA3D operator^(const PGA3D &a, const PGA3D &b) {
-  PGA3D res;
+ constexpr multivector operator^(multivector const& a, multivector const& b) {
+  multivector res;
   res[0] = b[0] * a[0];
   res[1] = b[1] * a[0] + b[0] * a[1];
   res[2] = b[2] * a[0] + b[0] * a[2];
@@ -231,11 +225,11 @@ inline constexpr PGA3D operator^(const PGA3D &a, const PGA3D &b) {
 };
 
 //***********************
-// PGA3D.Vee : res = a & b
+// multivector.Vee : res = a & b
 // The regressive product. (JOIN)
 //***********************
-inline constexpr PGA3D operator&(const PGA3D &a, const PGA3D &b) {
-  PGA3D res;
+ constexpr multivector operator&(multivector const& a, multivector const& b) {
+  multivector res;
   res[15] = 1 * (a[15] * b[15]);
   res[14] = -1 * (a[14] * -1 * b[15] + a[15] * b[14] * -1);
   res[13] = -1 * (a[13] * -1 * b[15] + a[15] * b[13] * -1);
@@ -274,11 +268,11 @@ inline constexpr PGA3D operator&(const PGA3D &a, const PGA3D &b) {
 };
 
 //***********************
-// PGA3D.Dot : res = a | b
+// multivector.Dot : res = a | b
 // The inner product.
 //***********************
-inline constexpr PGA3D operator|(const PGA3D &a, const PGA3D &b) {
-  PGA3D res;
+ constexpr multivector operator|(multivector const& a, multivector const& b) {
+  multivector res;
   res[0] = b[0] * a[0] + b[2] * a[2] + b[3] * a[3] + b[4] * a[4] - b[8] * a[8] -
            b[9] * a[9] - b[10] * a[10] - b[14] * a[14];
   res[1] = b[1] * a[0] + b[0] * a[1] - b[5] * a[2] - b[6] * a[3] - b[7] * a[4] +
@@ -309,11 +303,11 @@ inline constexpr PGA3D operator|(const PGA3D &a, const PGA3D &b) {
 };
 
 //***********************
-// PGA3D.Add : res = a + b
+// multivector.Add : res = a + b
 // Multivector addition
 //***********************
-inline constexpr PGA3D operator+(const PGA3D &a, const PGA3D &b) {
-  PGA3D res;
+ constexpr multivector operator+(multivector const& a, multivector const& b) {
+  multivector res;
   res[0] = a[0] + b[0];
   res[1] = a[1] + b[1];
   res[2] = a[2] + b[2];
@@ -334,11 +328,11 @@ inline constexpr PGA3D operator+(const PGA3D &a, const PGA3D &b) {
 };
 
 //***********************
-// PGA3D.Sub : res = a - b
+// multivector.Sub : res = a - b
 // Multivector subtraction
 //***********************
-inline constexpr PGA3D operator-(const PGA3D &a, const PGA3D &b) {
-  PGA3D res;
+ constexpr multivector operator-(multivector const& a, multivector const& b) {
+  multivector res;
   res[0] = a[0] - b[0];
   res[1] = a[1] - b[1];
   res[2] = a[2] - b[2];
@@ -359,11 +353,11 @@ inline constexpr PGA3D operator-(const PGA3D &a, const PGA3D &b) {
 };
 
 //***********************
-// PGA3D.smul : res = a * b
+// multivector.smul : res = a * b
 // scalar/multivector multiplication
 //***********************
-inline constexpr PGA3D operator*(const double &a, const PGA3D &b) {
-  PGA3D res;
+ constexpr multivector operator*(double a, multivector const& b) {
+  multivector res;
   res[0] = a * b[0];
   res[1] = a * b[1];
   res[2] = a * b[2];
@@ -384,11 +378,11 @@ inline constexpr PGA3D operator*(const double &a, const PGA3D &b) {
 };
 
 //***********************
-// PGA3D.muls : res = a * b
+// multivector.muls : res = a * b
 // multivector/scalar multiplication
 //***********************
-inline constexpr PGA3D operator*(const PGA3D &a, const double &b) {
-  PGA3D res;
+ constexpr multivector operator*(multivector const& a, double b) {
+  multivector res;
   res[0] = a[0] * b;
   res[1] = a[1] * b;
   res[2] = a[2] * b;
@@ -409,11 +403,11 @@ inline constexpr PGA3D operator*(const PGA3D &a, const double &b) {
 };
 
 //***********************
-// PGA3D.sadd : res = a + b
+// multivector.sadd : res = a + b
 // scalar/multivector addition
 //***********************
-inline constexpr PGA3D operator+(const double &a, const PGA3D &b) {
-  PGA3D res;
+ constexpr multivector operator+(double a, multivector const& b) {
+  multivector res;
   res[0] = a + b[0];
   res[1] = b[1];
   res[2] = b[2];
@@ -434,11 +428,11 @@ inline constexpr PGA3D operator+(const double &a, const PGA3D &b) {
 };
 
 //***********************
-// PGA3D.adds : res = a + b
+// multivector.adds : res = a + b
 // multivector/scalar addition
 //***********************
-inline constexpr PGA3D operator+(const PGA3D &a, const double &b) {
-  PGA3D res;
+ constexpr multivector operator+(multivector const& a, double b) {
+  multivector res;
   res[0] = a[0] + b;
   res[1] = a[1];
   res[2] = a[2];
@@ -459,11 +453,11 @@ inline constexpr PGA3D operator+(const PGA3D &a, const double &b) {
 };
 
 //***********************
-// PGA3D.ssub : res = a - b
+// multivector.ssub : res = a - b
 // scalar/multivector subtraction
 //***********************
-inline constexpr PGA3D operator-(const double &a, const PGA3D &b) {
-  PGA3D res;
+ constexpr multivector operator-(double a, multivector const& b) {
+  multivector res;
   res[0] = a - b[0];
   res[1] = -b[1];
   res[2] = -b[2];
@@ -484,11 +478,11 @@ inline constexpr PGA3D operator-(const double &a, const PGA3D &b) {
 };
 
 //***********************
-// PGA3D.subs : res = a - b
+// multivector.subs : res = a - b
 // multivector/scalar subtraction
 //***********************
-inline constexpr PGA3D operator-(const PGA3D &a, const double &b) {
-  PGA3D res;
+ constexpr multivector operator-(multivector const& a, double b) {
+  multivector res;
   res[0] = a[0] - b;
   res[1] = a[1];
   res[2] = a[2];
@@ -508,48 +502,68 @@ inline constexpr PGA3D operator-(const PGA3D &a, const double &b) {
   return res;
 };
 
-inline constexpr double PGA3D::norm() const {
-  return sqrt(std::abs(((*this) * Conjugate()).mvec[0]));
+// Define the basis blades
+static constexpr auto e0 = make_vector<1>(1.);
+static constexpr auto e1 = make_vector<2>(1.);
+static constexpr auto e2 = make_vector<3>(1.);
+static constexpr auto e3 = make_vector<4>(1.);
+static constexpr auto e01 = e0 ^ e1;
+static constexpr auto e02 = e0 ^ e2;
+static constexpr auto e03 = e0 ^ e3;
+static constexpr auto e12 = e1 ^ e2;
+static constexpr auto e31 = e3 ^ e1;
+static constexpr auto e23 = e2 ^ e3;
+static constexpr auto e021 = e0 ^ e2 ^ e1;
+static constexpr auto e013 = e0 ^ e1 ^ e3;
+static constexpr auto e032 = e0 ^ e3 ^ e2;
+static constexpr auto e123 = e1 ^ e2 ^ e3;
+static constexpr auto e0123 = e0 ^ e1 ^ e2 ^ e3;
+
+ constexpr double norm(multivector const& a) {
+  return std::sqrt(std::abs((a * conjugate(a))[0]));
 }
-inline constexpr double PGA3D::inorm() const { return (!(*this)).norm(); }
-inline constexpr PGA3D PGA3D::normalized() const { return (*this) * (1 / norm()); }
+ constexpr double inorm(multivector const& a) {
+  return norm(!a);
+}
+ constexpr multivector normalized(multivector const& a) {
+  return a * (1. / norm(a));
+}
 
 // A rotor (Euclidean line) and translator (Ideal line)
-PGA3D rotor(double angle, PGA3D line) {
-  return cos(angle / 2.0f) + sin(angle / 2.0f) * line.normalized();
+constexpr multivector rotor(double angle, multivector line) {
+  return std::cos(angle / 2.) + std::sin(angle / 2.) * normalized(line);
 }
-PGA3D translator(double dist, PGA3D line) { return 1.0f + dist / 2.0f * line; }
+constexpr multivector translator(double dist, multivector line) {
+  return 1. + dist / 2. * line;
+}
 
 
-// A plane is defined using its homogenous equation ax + by + cz + d = 0
-PGA3D plane(double a, double b, double c, double d) {
+// A plane is defined using its homogeneous equation ax + by + cz + d = 0
+constexpr multivector plane(double a, double b, double c, double d) {
   return a * e1 + b * e2 + c * e3 + d * e0;
 }
 
-// PGA points are trivectors.
-static PGA3D e123 = e1 ^ e2 ^ e3, e032 = e0 ^ e3 ^ e2, e013 = e0 ^ e1 ^ e3,
-             e021 = e0 ^ e2 ^ e1;
 
 // A point is just a homogeneous point, euclidean coordinates plus the origin
-PGA3D point(double x, double y, double z) {
+constexpr multivector point(double x, double y, double z) {
   return e123 + x * e032 + y * e013 + z * e021;
 }
 
 // for our toy problem (generate points on the surface of a torus)
 // we start with a function that generates motors.
 // circle(t) with t going from 0 to 1.
-PGA3D circle(double t, double radius, PGA3D line) {
-  return rotor(t * 2.0f * PI, line) * translator(radius, e1 * e0);
+constexpr multivector circle(double t, double radius, multivector const& line) {
+  return rotor(t * 2. * pi, line) * translator(radius, e1 * e0);
 }
 
 // a torus is now the product of two circles.
-PGA3D torus(double s, double t, double r1, PGA3D l1, double r2, PGA3D l2) {
+constexpr multivector torus(double s, double t, double r1, multivector const& l1, double r2, multivector const& l2) {
   return circle(s, r2, l2) * circle(t, r1, l1);
 }
 
 // and to sample its points we simply sandwich the origin ..
-PGA3D point_on_torus(double s, double t) {
-  PGA3D to = torus(s, t, 0.25f, e1 * e2, 0.6f, e1 * e3);
+constexpr multivector point_on_torus(double s, double t) {
+  multivector to = torus(s, t, 0.25f, e1 * e2, 0.6f, e1 * e3);
   return to * e123 * ~to;
 }
 
@@ -557,31 +571,31 @@ void test() {
 
   // Elements of the even subalgebra (scalar + bivector + pss) of unit length
   // are motors
-  [[maybe_unused]] PGA3D rot = rotor(PI / 2.0f, e1 * e2);
+  [[maybe_unused]] auto const rot = rotor(pi / 2., e1 * e2);
 
   // The outer product ^ is the MEET. Here we intersect the yz (x=0) and xz
   // (y=0) planes.
-  [[maybe_unused]] PGA3D ax_z = e1 ^ e2;
+  [[maybe_unused]] auto const ax_z = e1 ^ e2;
 
   // line and plane meet in point. We intersect the line along the z-axis
   // (x=0,y=0) with the xy (z=0) plane.
-  [[maybe_unused]] PGA3D orig = ax_z ^ e3;
+  [[maybe_unused]] auto const orig = ax_z ^ e3;
 
   // We can also easily create points and join them into a line using the
   // regressive (vee, &) product.
-  [[maybe_unused]] PGA3D px = point(1.0, 0.0, 0.0);
-  [[maybe_unused]] PGA3D line = orig & px;
+  [[maybe_unused]] auto const px = point(1.0, 0.0, 0.0);
+  [[maybe_unused]] auto const line = orig & px;
 
   // Lets also create the plane with equation 2x + z - 3 = 0
-  [[maybe_unused]] PGA3D p = plane(2, 0, 1, -3);
+  [[maybe_unused]] auto const p = plane(2, 0, 1, -3);
 
   // rotations work on all elements
-  [[maybe_unused]] PGA3D rotated_plane = rot * p * ~rot;
-  [[maybe_unused]] PGA3D rotated_line = rot * line * ~rot;
-  [[maybe_unused]] PGA3D rotated_point = rot * px * ~rot;
+  [[maybe_unused]] auto const rotated_plane = rot * p * ~rot;
+  [[maybe_unused]] auto const rotated_line = rot * line * ~rot;
+  [[maybe_unused]] auto const rotated_point = rot * px * ~rot;
 
   // See the 3D PGA Cheat sheet for a huge collection of useful formulas
-  [[maybe_unused]] PGA3D point_on_plane = (p | px) * p;
+  [[maybe_unused]] auto const point_on_plane = (p | px) * p;
 
   // Some output.
   // printf("a point       : ");
@@ -601,8 +615,8 @@ void test() {
   // printf("point on plane: ");
   // point_on_plane.normalized().log();
   // printf("point on torus: ");
-  // point_on_torus(0.0f, 0.0f).log();
-  // (e0 - 1.0f).log();
-  // (1.0f - e0).log();
+  // point_on_torus(0., 0.).log();
+  // (e0 - 1.).log();
+  // (1. - e0).log();
 }
 } // namespace pga

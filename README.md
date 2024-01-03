@@ -16,7 +16,10 @@ Build the repository in the container
 cmake -S src/landy/ -B build
 cmake --build build
 ```
-
+Test the repository in the container
+```shell
+ctest --test-dir build
+```
 # Run
 ```shell
 username@landy-dev:~/ws$ ./build/landy_example

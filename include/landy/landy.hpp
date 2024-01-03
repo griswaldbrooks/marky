@@ -6,17 +6,12 @@
 #include "mp-units/systems/si/si.h"
 #include "mp-units/systems/isq/isq.h"
 #include "mp-units/math.h"
-#include "pga.hpp"
 
 using namespace mp_units;
 using namespace::si::unit_symbols;
 using namespace std::numbers;
 
 namespace landy::geometry {
-
-void test_pga() {
-  pga::test();
-}
 
 template <typename T>
 [[nodiscard]] bool is_near(T const& lhs, T const& rhs, T const& tolerance = 1e-6) {
