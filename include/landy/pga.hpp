@@ -35,9 +35,17 @@ using namespace std::numbers;
 // };
 //
 using multivector = std::array<double, 16>;
+
+constexpr multivector make_scalar(double value) {
+  multivector result;
+  result[0] = value;
+  return result;
+}
+
 template <std::size_t Index>
 constexpr multivector make_vector(double value) {
-  static_assert(Index < 16, "Multivectors only have 16 elements");
+  static_assert(Index >= 1, "Vector elements range from 1 to 4");
+  static_assert(Index < 5, "Vector elements range from 1 to 4");
   multivector result;
   result[Index] = value;
   return result;
@@ -519,6 +527,8 @@ constexpr multivector operator*(multivector const& a, multivector const& b) {
 };
 
 // Define the basis blades
+static constexpr auto zero = multivector{};
+static constexpr auto one = make_scalar(1.);
 static constexpr auto e0 = make_vector<1>(1.);
 static constexpr auto e1 = make_vector<2>(1.);
 static constexpr auto e2 = make_vector<3>(1.);
