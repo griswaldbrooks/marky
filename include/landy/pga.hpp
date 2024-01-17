@@ -1,40 +1,56 @@
 #pragma once
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <numbers>
+#include <ostream>
+#include <span>
 
 namespace pga {
 
 using namespace std::numbers;
 
-struct multivector {
- template <std::size_t Index>
-    constexpr void set(double value) {
-    static_assert(Index < 16, "Multivectors only have 16 elements");
-        std::get<Index>(elements_) = value;
-    } 
-  constexpr double& operator[](std::size_t idx) { return elements_[idx]; }
-  constexpr double operator[](std::size_t idx) const { return elements_[idx]; }
-  // implements const iterator for the elements 
-  constexpr auto cbegin() const { return elements_.cbegin(); }
-  constexpr auto cend() const { return elements_.cend(); }
-  constexpr auto begin() { return elements_.begin(); }
-  constexpr auto end() { return elements_.end(); }
-
-private:
-  std::array<double, 16> elements_ = {};
-};
-
+// struct multivector {
+//   constexpr multivector() = default;
+//   constexpr multivector(std::span<double, 16> elements){
+//     std::copy(elements.begin(), elements.end(), elements_.begin());
+//   }
+//  template <std::size_t Index>
+//     constexpr void set(double value) {
+//     static_assert(Index < 16, "Multivectors only have 16 elements");
+//         std::get<Index>(elements_) = value;
+//     }
+//   constexpr double& operator[](std::size_t idx) { return elements_[idx]; }
+//   constexpr double operator[](std::size_t idx) const { return elements_[idx]; }
+//   // implements const iterator for the elements
+//   constexpr auto cbegin() const { return elements_.cbegin(); }
+//   constexpr auto cend() const { return elements_.cend(); }
+//   constexpr auto begin() { return elements_.begin(); }
+//   constexpr auto end() { return elements_.end(); }
+//   constexpr auto rbegin() { return elements_.rbegin(); }
+//   constexpr auto rend() { return elements_.rend(); }
+//
+// private:
+//   std::array<double, 16> elements_ = {};
+// };
+//
+using multivector = std::array<double, 16>;
 template <std::size_t Index>
 constexpr multivector make_vector(double value) {
+  static_assert(Index < 16, "Multivectors only have 16 elements");
   multivector result;
-  result.set<Index>(value);
+  result[Index] = value;
   return result;
 }
 
 constexpr bool operator==(multivector const& a, multivector const& b) {
   return std::equal(a.cbegin(), a.cend(), b.cbegin(), b.cend());
 }
+
+constexpr void operator<<(std::ostream& os, multivector const& a) {
+  std::for_each(a.cbegin(), a.cend(), [&](auto const& e){ os << e << ", ";});
+}
+
 //***********************
 // multivector.Reverse : res = ~a
 // Reverse the order of the basis blades.

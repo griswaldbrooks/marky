@@ -19,14 +19,6 @@ multivector brute_force_add(multivector const& a, multivector const& b) {
   return result;
 }
 
-void fill_increasing(multivector& m) {
-  std::iota(m.begin(), m.end(), 0.);
-}
-
-void fill_decreasing(multivector& m) {
-  std::iota(m.rbegin(), m.rend(), 0.);
-}
-
 TEST(Multivector, ZeroInitialized) {
  auto const a = multivector{};
   auto const expected = make_zero_multivector();
@@ -41,8 +33,53 @@ TEST(Multivector, Addition) {
   EXPECT_EQ(result, expected);
 }
 
-// TEST(Multivector, Reverse) {
-//   auto const a = make_zero_multivector();
-//   fill_increasing(a);
-// }
+TEST(Multivector, Reverse) {
+  auto const a = multivector{1., // scalar
+    2., 3., 4., 5., // vector
+    6., 7., 8., 9., 10., 11.,// bivector
+    12., 13., 14., 15.,// trivector
+    16.}; // pseudoscalar
+  auto const expected = multivector{1., 2., 3., 4., 5., -6., -7., -8.,
+                                    -9., -10., -11., -12., -13., -14., -15., 16.};
+  EXPECT_EQ(~a, expected);
+}
+
+TEST(Multivector, Dual) {
+  auto const a = multivector{1., // scalar
+    2., 3., 4., 5., // vector
+    6., 7., 8., 9., 10., 11.,// bivector
+    12., 13., 14., 15.,// trivector
+    16.}; // pseudoscalar
+  auto const expected = multivector{16., 15., 14., 13., 12., 11., 10., 9.,
+                                    8., 7., 6., 5., 4., 3., 2., 1.};
+  EXPECT_EQ(!a, expected);
+}
+
+TEST(Multivector, Conjugate) {
+  auto const a = multivector{1., // scalar
+    2., 3., 4., 5., // vector
+    6., 7., 8., 9., 10., 11.,// bivector
+    12., 13., 14., 15.,// trivector
+    16.}; // pseudoscalar
+  auto const expected = multivector{1.,//
+    -2., -3., -4., -5., //
+    -6., -7., -8., -9., -10., -11., //
+    12., 13., 14., 15., //
+    16.};
+  EXPECT_EQ(conjugate(a), expected);
+}
+
+TEST(Multivector, Involute){
+  auto const a = multivector{1., // scalar
+    2., 3., 4., 5., // vector
+    6., 7., 8., 9., 10., 11.,// bivector
+    12., 13., 14., 15.,// trivector
+    16.}; // pseudoscalar
+  auto const expected = multivector{1., // scalar
+    -2., -3., -4., -5., // vector
+    6., 7., 8., 9., 10., 11.,// bivector
+    -12., -13., -14., -15.,// trivector
+    16.}; // pseudoscalar
+  EXPECT_EQ(involute(a), expected);
+}
 } // namespace landy::pga
