@@ -474,4 +474,983 @@ INSTANTIATE_TEST_SUITE_P(GeometricProductBivectorTrivector, GeometricProductFixt
 INSTANTIATE_TEST_SUITE_P(GeometricProductAntiscalar, GeometricProductFixture, antiscalar_product);
 
 }  // namespace geometric_product
-} // namespace landy::pga
+
+namespace wedge_product {
+
+TEST(Multivector, ScalarWedge){
+  EXPECT_EQ(one ^ one, one);
+}
+
+struct scenario {
+    std::string display;
+    multivector lhs;
+    multivector rhs;
+    multivector expected;
+};
+
+std::ostream& operator<<(std::ostream& os, scenario const& s) {
+    return os << s.display;
+}
+
+auto const vector_product = ::testing::Values(
+    scenario{"e0 ^ e0", e0, e0, zero},
+    scenario{"e0 ^ e1", e0, e1, e01},
+    scenario{"e0 ^ e2", e0, e2, e02},
+    scenario{"e0 ^ e3", e0, e3, e03},
+    scenario{"e1 ^ e0", e1, e0, -e01},
+    scenario{"e1 ^ e1", e1, e1, zero},
+    scenario{"e1 ^ e2", e1, e2, e12},
+    scenario{"e1 ^ e3", e1, e3, -e31},
+    scenario{"e2 ^ e0", e2, e0, -e02},
+    scenario{"e2 ^ e1", e2, e1, -e12},
+    scenario{"e2 ^ e2", e2, e2, zero},
+    scenario{"e2 ^ e3", e2, e3, e23},
+    scenario{"e3 ^ e0", e3, e0, -e03},
+    scenario{"e3 ^ e1", e3, e1, e31},
+    scenario{"e3 ^ e2", e3, e2, -e23},
+    scenario{"e3 ^ e3", e3, e3, zero});
+
+auto const bivector_product = ::testing::Values(
+    scenario{"e01 ^ e01", e01, e01, zero},
+    scenario{"e01 ^ e02", e01, e02, zero},
+    scenario{"e01 ^ e03", e01, e03, zero},
+    scenario{"e01 ^ e12", e01, e12, zero},
+    scenario{"e01 ^ e23", e01, e23, e0123},
+    scenario{"e01 ^ e31", e01, e31, zero},
+
+    scenario{"e02 ^ e01", e02, e01, zero},
+    scenario{"e02 ^ e02", e02, e02, zero},
+    scenario{"e02 ^ e03", e02, e03, zero},
+    scenario{"e02 ^ e12", e02, e12, zero},
+    scenario{"e02 ^ e23", e02, e23, zero},
+    scenario{"e02 ^ e31", e02, e31, e0123},
+
+    scenario{"e03 ^ e01", e03, e01, zero},
+    scenario{"e03 ^ e02", e03, e02, zero},
+    scenario{"e03 ^ e03", e03, e03, zero},
+    scenario{"e03 ^ e12", e03, e12, e0123},
+    scenario{"e03 ^ e23", e03, e23, zero},
+    scenario{"e03 ^ e31", e03, e31, zero},
+
+    scenario{"e12 ^ e01", e12, e01, zero},
+    scenario{"e12 ^ e02", e12, e02, zero},
+    scenario{"e12 ^ e03", e12, e03, e0123},
+    scenario{"e12 ^ e12", e12, e12, zero},
+    scenario{"e12 ^ e23", e12, e23, zero},
+    scenario{"e12 ^ e31", e12, e31, zero},
+
+    scenario{"e23 ^ e01", e23, e01, e0123},
+    scenario{"e23 ^ e02", e23, e02, zero},
+    scenario{"e23 ^ e03", e23, e03, zero},
+    scenario{"e23 ^ e12", e23, e12, zero},
+    scenario{"e23 ^ e23", e23, e23, zero},
+    scenario{"e23 ^ e31", e23, e31, zero},
+
+    scenario{"e31 ^ e01", e31, e01, zero},
+    scenario{"e31 ^ e02", e31, e02, e0123},
+    scenario{"e31 ^ e03", e31, e03, zero},
+    scenario{"e31 ^ e12", e31, e12, zero},
+    scenario{"e31 ^ e23", e31, e23, zero},
+    scenario{"e31 ^ e31", e31, e31, zero});
+
+auto const bivector_vector_product = ::testing::Values(
+    scenario{"e01 ^ e0", e01, e0, zero},
+    scenario{"e01 ^ e1", e01, e1, zero},
+    scenario{"e01 ^ e2", e01, e2, -e021},
+    scenario{"e01 ^ e3", e01, e3, e013},
+
+    scenario{"e02 ^ e0", e02, e0, zero},
+    scenario{"e02 ^ e1", e02, e1, e021},
+    scenario{"e02 ^ e2", e02, e2, zero},
+    scenario{"e02 ^ e3", e02, e3, -e032},
+
+    scenario{"e03 ^ e0", e03, e0, zero},
+    scenario{"e03 ^ e1", e03, e1, -e013},
+    scenario{"e03 ^ e2", e03, e2, e032},
+    scenario{"e03 ^ e3", e03, e3, zero},
+
+    scenario{"e12 ^ e0", e12, e0, -e021},
+    scenario{"e12 ^ e1", e12, e1, zero},
+    scenario{"e12 ^ e2", e12, e2, zero},
+    scenario{"e12 ^ e3", e12, e3, e123},
+
+    scenario{"e31 ^ e0", e31, e0, -e013},
+    scenario{"e31 ^ e1", e31, e1, zero},
+    scenario{"e31 ^ e2", e31, e2, e123},
+    scenario{"e31 ^ e3", e31, e3, zero},
+
+    scenario{"e23 ^ e0", e23, e0, -e032},
+    scenario{"e23 ^ e1", e23, e1, e123},
+    scenario{"e23 ^ e2", e23, e2, zero},
+    scenario{"e23 ^ e3", e23, e3, zero});
+
+auto const vector_bivector_product = ::testing::Values(
+    scenario{"e0 ^ e01", e0, e01, zero},
+    scenario{"e0 ^ e02", e0, e02, zero},
+    scenario{"e0 ^ e03", e0, e03, zero},
+    scenario{"e0 ^ e12", e0, e12, -e021},
+    scenario{"e0 ^ e31", e0, e31, -e013},
+    scenario{"e0 ^ e23", e0, e23, -e032},
+
+    scenario{"e1 ^ e01", e1, e01, zero},
+    scenario{"e1 ^ e02", e1, e02, e021},
+    scenario{"e1 ^ e03", e1, e03, -e013},
+    scenario{"e1 ^ e12", e1, e12, zero},
+    scenario{"e1 ^ e31", e1, e31, zero},
+    scenario{"e1 ^ e23", e1, e23, e123},
+
+    scenario{"e2 ^ e01", e2, e01, -e021},
+    scenario{"e2 ^ e02", e2, e02, zero},
+    scenario{"e2 ^ e03", e2, e03, e032},
+    scenario{"e2 ^ e12", e2, e12, zero},
+    scenario{"e2 ^ e31", e2, e31, e123},
+    scenario{"e2 ^ e23", e2, e23, zero},
+
+    scenario{"e3 ^ e01", e3, e01, e013},
+    scenario{"e3 ^ e02", e3, e02, -e032},
+    scenario{"e3 ^ e03", e3, e03, zero},
+    scenario{"e3 ^ e12", e3, e12, e123},
+    scenario{"e3 ^ e31", e3, e31, zero},
+    scenario{"e3 ^ e23", e3, e23, zero});
+
+auto const trivector_product = ::testing::Values(
+    scenario("e021 ^ e021", e021, e021, zero),
+    scenario("e021 ^ e013", e021, e013, zero),
+    scenario("e021 ^ e032", e021, e032, zero),
+    scenario("e021 ^ e123", e021, e123, zero),
+
+    scenario("e013 ^ e021", e013, e021, zero),
+    scenario("e013 ^ e013", e013, e013, zero),
+    scenario("e013 ^ e032", e013, e032, zero),
+    scenario("e013 ^ e123", e013, e123, zero),
+
+    scenario("e032 ^ e021", e032, e021, zero),
+    scenario("e032 ^ e013", e032, e013, zero),
+    scenario("e032 ^ e032", e032, e032, zero),
+    scenario("e032 ^ e123", e032, e123, zero),
+
+    scenario("e123 ^ e021", e123, e021, zero),
+    scenario("e123 ^ e013", e123, e013, zero),
+    scenario("e123 ^ e032", e123, e032, zero),
+    scenario("e123 ^ e123", e123, e123, zero)
+);
+
+auto const trivector_vector_product = ::testing::Values(
+    scenario("e021 ^ e0", e021, e0, zero),
+    scenario("e021 ^ e1", e021, e1, zero),
+    scenario("e021 ^ e2", e021, e2, zero),
+    scenario("e021 ^ e3", e021, e3, -e0123),
+
+    scenario("e013 ^ e0", e013, e0, zero),
+    scenario("e013 ^ e1", e013, e1, zero),
+    scenario("e013 ^ e2", e013, e2, -e0123),
+    scenario("e013 ^ e3", e013, e3, zero),
+
+    scenario("e032 ^ e0", e032, e0, zero),
+    scenario("e032 ^ e1", e032, e1, -e0123),
+    scenario("e032 ^ e2", e032, e2, zero),
+    scenario("e032 ^ e3", e032, e3, zero),
+
+    scenario("e123 ^ e0", e123, e0, -e0123),
+    scenario("e123 ^ e1", e123, e1, zero),
+    scenario("e123 ^ e2", e123, e2, zero),
+    scenario("e123 ^ e3", e123, e3, zero)
+);
+
+auto const vector_trivector_product = ::testing::Values(
+  scenario("e0 ^ e021", e0, e021, zero),
+  scenario("e0 ^ e013", e0, e013, zero),
+  scenario("e0 ^ e032", e0, e032, zero),
+  scenario("e0 ^ e123", e0, e123, e0123),
+
+  scenario("e1 ^ e021", e1, e021, zero),
+  scenario("e1 ^ e013", e1, e013, zero),
+  scenario("e1 ^ e032", e1, e032, e0123),
+  scenario("e1 ^ e123", e1, e123, zero),
+
+  scenario("e2 ^ e021", e2, e021, zero),
+  scenario("e2 ^ e013", e2, e013, e0123),
+  scenario("e2 ^ e032", e2, e032, zero),
+  scenario("e2 ^ e123", e2, e123, zero),
+
+  scenario("e3 ^ e021", e3, e021, e0123),
+  scenario("e3 ^ e013", e3, e013, zero),
+  scenario("e3 ^ e032", e3, e032, zero),
+  scenario("e3 ^ e123", e3, e123, zero)
+);
+
+auto const trivector_bivector_product = ::testing::Values(
+    scenario("e021 ^ e01", e021, e01, zero),
+    scenario("e021 ^ e02", e021, e02, zero),
+    scenario("e021 ^ e03", e021, e03, zero),
+    scenario("e021 ^ e12", e021, e12, zero),
+    scenario("e021 ^ e31", e021, e31, zero),
+    scenario("e021 ^ e23", e021, e23, zero),
+
+    scenario("e013 ^ e01", e013, e01, zero),
+    scenario("e013 ^ e02", e013, e02, zero),
+    scenario("e013 ^ e03", e013, e03, zero),
+    scenario("e013 ^ e12", e013, e12, zero),
+    scenario("e013 ^ e31", e013, e31, zero),
+    scenario("e013 ^ e23", e013, e23, zero),
+
+    scenario("e032 ^ e01", e032, e01, zero),
+    scenario("e032 ^ e02", e032, e02, zero),
+    scenario("e032 ^ e03", e032, e03, zero),
+    scenario("e032 ^ e12", e032, e12, zero),
+    scenario("e032 ^ e31", e032, e31, zero),
+    scenario("e032 ^ e23", e032, e23, zero),
+
+    scenario("e123 ^ e01", e123, e01, zero),
+    scenario("e123 ^ e02", e123, e02, zero),
+    scenario("e123 ^ e03", e123, e03, zero),
+    scenario("e123 ^ e12", e123, e12, zero),
+    scenario("e123 ^ e31", e123, e31, zero),
+    scenario("e123 ^ e23", e123, e23, zero)
+);
+
+auto const bivector_trivector_product = ::testing::Values(
+    scenario("e01 ^ e021", e01, e021, zero),
+    scenario("e01 ^ e013", e01, e013, zero),
+    scenario("e01 ^ e032", e01, e032, zero),
+    scenario("e01 ^ e123", e01, e123, zero),
+
+    scenario("e02 ^ e021", e02, e021, zero),
+    scenario("e02 ^ e013", e02, e013, zero),
+    scenario("e02 ^ e032", e02, e032, zero),
+    scenario("e02 ^ e123", e02, e123, zero),
+
+    scenario("e03 ^ e021", e03, e021, zero),
+    scenario("e03 ^ e013", e03, e013, zero),
+    scenario("e03 ^ e032", e03, e032, zero),
+    scenario("e03 ^ e123", e03, e123, zero),
+
+    scenario("e12 ^ e021", e12, e021, zero),
+    scenario("e12 ^ e013", e12, e013, zero),
+    scenario("e12 ^ e032", e12, e032, zero),
+    scenario("e12 ^ e123", e12, e123, zero),
+
+    scenario("e31 ^ e021", e31, e021, zero),
+    scenario("e31 ^ e013", e31, e013, zero),
+    scenario("e31 ^ e032", e31, e032, zero),
+    scenario("e31 ^ e123", e31, e123, zero),
+
+    scenario("e23 ^ e021", e23, e021, zero),
+    scenario("e23 ^ e013", e23, e013, zero),
+    scenario("e23 ^ e032", e23, e032, zero),
+    scenario("e23 ^ e123", e23, e123, zero)
+);
+
+auto const antiscalar_product = ::testing::Values(
+    scenario("e0123 ^ e0", e0123, e0, zero),
+    scenario("e0123 ^ e1", e0123, e1, zero),
+    scenario("e0123 ^ e2", e0123, e2, zero),
+    scenario("e0123 ^ e3", e0123, e3, zero),
+    scenario("e0 ^ e0123", e0, e0123, zero),
+    scenario("e1 ^ e0123", e1, e0123, zero),
+    scenario("e2 ^ e0123", e2, e0123, zero),
+    scenario("e3 ^ e0123", e3, e0123, zero),
+
+    scenario("e0123 ^ e01", e0123, e01, zero),
+    scenario("e0123 ^ e02", e0123, e02, zero),
+    scenario("e0123 ^ e03", e0123, e03, zero),
+    scenario("e0123 ^ e12", e0123, e12, zero),
+    scenario("e0123 ^ e31", e0123, e31, zero),
+    scenario("e0123 ^ e23", e0123, e23, zero),
+    scenario("e01 ^ e0123", e01, e0123, zero),
+    scenario("e02 ^ e0123", e02, e0123, zero),
+    scenario("e03 ^ e0123", e03, e0123, zero),
+    scenario("e12 ^ e0123", e12, e0123, zero),
+    scenario("e31 ^ e0123", e31, e0123, zero),
+    scenario("e23 ^ e0123", e23, e0123, zero),
+
+    scenario("e0123 ^ e021", e0123, e021, zero),
+    scenario("e0123 ^ e013", e0123, e013, zero),
+    scenario("e0123 ^ e032", e0123, e032, zero),
+    scenario("e0123 ^ e123", e0123, e123, zero),
+    scenario("e021 ^ e0123", e021, e0123, zero),
+    scenario("e013 ^ e0123", e013, e0123, zero),
+    scenario("e032 ^ e0123", e032, e0123, zero),
+    scenario("e123 ^ e0123", e123, e0123, zero),
+
+    scenario("e0123 ^ e0123", e0123, e0123, zero)
+);
+
+struct WedgeProductFixture : public ::testing::TestWithParam<scenario> {};
+
+TEST_P(WedgeProductFixture, WedgeProduct) {
+    // GIVEN two multivectors
+    auto const [_, lhs, rhs, expected] = GetParam();
+
+    // WHEN we take their wedge product
+    auto const result = lhs ^ rhs;
+
+    // THEN it will be the product we expect
+    EXPECT_EQ(result, expected);
+}
+
+INSTANTIATE_TEST_SUITE_P(WedgeProductVector, WedgeProductFixture, vector_product);
+INSTANTIATE_TEST_SUITE_P(WedgeProductBivector, WedgeProductFixture, bivector_product);
+INSTANTIATE_TEST_SUITE_P(WedgeProductBivectorVector, WedgeProductFixture, bivector_vector_product);
+INSTANTIATE_TEST_SUITE_P(WedgeProductVectorBivector, WedgeProductFixture, vector_bivector_product);
+INSTANTIATE_TEST_SUITE_P(WedgeProductTrivector, WedgeProductFixture, trivector_product);
+INSTANTIATE_TEST_SUITE_P(WedgeProductTrivectorVector, WedgeProductFixture, trivector_vector_product);
+INSTANTIATE_TEST_SUITE_P(WedgeProductVectorTrivector, WedgeProductFixture, vector_trivector_product);
+INSTANTIATE_TEST_SUITE_P(WedgeProductTrivectorBivector, WedgeProductFixture, trivector_bivector_product);
+INSTANTIATE_TEST_SUITE_P(WedgeProductBivectorTrivector, WedgeProductFixture, bivector_trivector_product);
+INSTANTIATE_TEST_SUITE_P(WedgeProductAntiscalar, WedgeProductFixture, antiscalar_product);
+
+}  // namespace wedge_product
+namespace regressive_product {
+
+TEST(Multivector, ScalarRegressive){
+  EXPECT_EQ(one & one, zero);
+}
+
+struct scenario {
+    std::string display;
+    multivector lhs;
+    multivector rhs;
+    multivector expected;
+};
+
+std::ostream& operator<<(std::ostream& os, scenario const& s) {
+    return os << s.display;
+}
+
+auto const vector_product = ::testing::Values(
+    scenario{"e0 & e0", e0, e0, zero},
+    scenario{"e0 & e1", e0, e1, zero},
+    scenario{"e0 & e2", e0, e2, zero},
+    scenario{"e0 & e3", e0, e3, zero},
+    scenario{"e1 & e0", e1, e0, zero},
+    scenario{"e1 & e1", e1, e1, zero},
+    scenario{"e1 & e2", e1, e2, zero},
+    scenario{"e1 & e3", e1, e3, zero},
+    scenario{"e2 & e0", e2, e0, zero},
+    scenario{"e2 & e1", e2, e1, zero},
+    scenario{"e2 & e2", e2, e2, zero},
+    scenario{"e2 & e3", e2, e3, zero},
+    scenario{"e3 & e0", e3, e0, zero},
+    scenario{"e3 & e1", e3, e1, zero},
+    scenario{"e3 & e2", e3, e2, zero},
+    scenario{"e3 & e3", e3, e3, zero});
+
+auto const bivector_product = ::testing::Values(
+    scenario{"e01 & e01", e01, e01, zero},
+    scenario{"e01 & e02", e01, e02, zero},
+    scenario{"e01 & e03", e01, e03, zero},
+    scenario{"e01 & e12", e01, e12, zero},
+    scenario{"e01 & e31", e01, e31, zero},
+    scenario{"e01 & e23", e01, e23, one},
+
+    scenario{"e02 & e01", e02, e01, zero},
+    scenario{"e02 & e02", e02, e02, zero},
+    scenario{"e02 & e03", e02, e03, zero},
+    scenario{"e02 & e12", e02, e12, zero},
+    scenario{"e02 & e31", e02, e31, one},
+    scenario{"e02 & e23", e02, e23, zero},
+
+    scenario{"e03 & e01", e03, e01, zero},
+    scenario{"e03 & e02", e03, e02, zero},
+    scenario{"e03 & e03", e03, e03, zero},
+    scenario{"e03 & e12", e03, e12, one},
+    scenario{"e03 & e31", e03, e31, zero},
+    scenario{"e03 & e23", e03, e23, zero},
+
+    scenario{"e12 & e01", e12, e01, zero},
+    scenario{"e12 & e02", e12, e02, zero},
+    scenario{"e12 & e03", e12, e03, one},
+    scenario{"e12 & e12", e12, e12, zero},
+    scenario{"e12 & e31", e12, e31, zero},
+    scenario{"e12 & e23", e12, e23, zero},
+
+    scenario{"e23 & e01", e23, e01, one},
+    scenario{"e23 & e02", e23, e02, zero},
+    scenario{"e23 & e03", e23, e03, zero},
+    scenario{"e23 & e12", e23, e12, zero},
+    scenario{"e23 & e31", e23, e31, zero},
+    scenario{"e23 & e23", e23, e23, zero},
+
+    scenario{"e31 & e01", e31, e01, zero},
+    scenario{"e31 & e02", e31, e02, one},
+    scenario{"e31 & e03", e31, e03, zero},
+    scenario{"e31 & e12", e31, e12, zero},
+    scenario{"e31 & e31", e31, e31, zero},
+    scenario{"e31 & e23", e31, e23, zero});
+
+auto const bivector_vector_product = ::testing::Values(
+    scenario{"e01 & e0", e01, e0, zero},
+    scenario{"e01 & e1", e01, e1, zero},
+    scenario{"e01 & e2", e01, e2, zero},
+    scenario{"e01 & e3", e01, e3, zero},
+
+    scenario{"e02 & e0", e02, e0, zero},
+    scenario{"e02 & e1", e02, e1, zero},
+    scenario{"e02 & e2", e02, e2, zero},
+    scenario{"e02 & e3", e02, e3, zero},
+
+    scenario{"e03 & e0", e03, e0, zero},
+    scenario{"e03 & e1", e03, e1, zero},
+    scenario{"e03 & e2", e03, e2, zero},
+    scenario{"e03 & e3", e03, e3, zero},
+
+    scenario{"e12 & e0", e12, e0, zero},
+    scenario{"e12 & e1", e12, e1, zero},
+    scenario{"e12 & e2", e12, e2, zero},
+    scenario{"e12 & e3", e12, e3, zero},
+
+    scenario{"e31 & e0", e31, e0, zero},
+    scenario{"e31 & e1", e31, e1, zero},
+    scenario{"e31 & e2", e31, e2, zero},
+    scenario{"e31 & e3", e31, e3, zero},
+
+    scenario{"e23 & e0", e23, e0, zero},
+    scenario{"e23 & e1", e23, e1, zero},
+    scenario{"e23 & e2", e23, e2, zero},
+    scenario{"e23 & e3", e23, e3, zero});
+
+auto const vector_bivector_product = ::testing::Values(
+    scenario{"e0 & e01", e0, e01, zero},
+    scenario{"e0 & e02", e0, e02, zero},
+    scenario{"e0 & e03", e0, e03, zero},
+    scenario{"e0 & e12", e0, e12, zero},
+    scenario{"e0 & e31", e0, e31, zero},
+    scenario{"e0 & e23", e0, e23, zero},
+
+    scenario{"e1 & e01", e1, e01, zero},
+    scenario{"e1 & e02", e1, e02, zero},
+    scenario{"e1 & e03", e1, e03, zero},
+    scenario{"e1 & e12", e1, e12, zero},
+    scenario{"e1 & e31", e1, e31, zero},
+    scenario{"e1 & e23", e1, e23, zero},
+
+    scenario{"e2 & e01", e2, e01, zero},
+    scenario{"e2 & e02", e2, e02, zero},
+    scenario{"e2 & e03", e2, e03, zero},
+    scenario{"e2 & e12", e2, e12, zero},
+    scenario{"e2 & e31", e2, e31, zero},
+    scenario{"e2 & e23", e2, e23, zero},
+
+    scenario{"e3 & e01", e3, e01, zero},
+    scenario{"e3 & e02", e3, e02, zero},
+    scenario{"e3 & e03", e3, e03, zero},
+    scenario{"e3 & e12", e3, e12, zero},
+    scenario{"e3 & e31", e3, e31, zero},
+    scenario{"e3 & e23", e3, e23, zero});
+
+auto const trivector_product = ::testing::Values(
+    scenario("e021 & e021", e021, e021, zero),
+    scenario("e021 & e013", e021, e013, e01),
+    scenario("e021 & e032", e021, e032, -e02),
+    scenario("e021 & e123", e021, e123, e12),
+
+    scenario("e013 & e021", e013, e021, -e01),
+    scenario("e013 & e013", e013, e013, zero),
+    scenario("e013 & e032", e013, e032, e03),
+    scenario("e013 & e123", e013, e123, e31),
+
+    scenario("e032 & e021", e032, e021, e02),
+    scenario("e032 & e013", e032, e013, -e03),
+    scenario("e032 & e032", e032, e032, zero),
+    scenario("e032 & e123", e032, e123, e23),
+
+    scenario("e123 & e021", e123, e021, -e12),
+    scenario("e123 & e013", e123, e013, -e31),
+    scenario("e123 & e032", e123, e032, -e23),
+    scenario("e123 & e123", e123, e123, zero)
+);
+
+auto const trivector_vector_product = ::testing::Values(
+    scenario("e021 & e0", e021, e0, zero),
+    scenario("e021 & e1", e021, e1, zero),
+    scenario("e021 & e2", e021, e2, zero),
+    scenario("e021 & e3", e021, e3, one),
+
+    scenario("e013 & e0", e013, e0, zero),
+    scenario("e013 & e1", e013, e1, zero),
+    scenario("e013 & e2", e013, e2, one),
+    scenario("e013 & e3", e013, e3, zero),
+
+    scenario("e032 & e0", e032, e0, zero),
+    scenario("e032 & e1", e032, e1, one),
+    scenario("e032 & e2", e032, e2, zero),
+    scenario("e032 & e3", e032, e3, zero),
+
+    scenario("e123 & e0", e123, e0, one),
+    scenario("e123 & e1", e123, e1, zero),
+    scenario("e123 & e2", e123, e2, zero),
+    scenario("e123 & e3", e123, e3, zero)
+);
+
+auto const vector_trivector_product = ::testing::Values(
+  scenario("e0 & e021", e0, e021, zero),
+  scenario("e0 & e013", e0, e013, zero),
+  scenario("e0 & e032", e0, e032, zero),
+  scenario("e0 & e123", e0, e123, -one),
+
+  scenario("e1 & e021", e1, e021, zero),
+  scenario("e1 & e013", e1, e013, zero),
+  scenario("e1 & e032", e1, e032, -one),
+  scenario("e1 & e123", e1, e123, zero),
+
+  scenario("e2 & e021", e2, e021, zero),
+  scenario("e2 & e013", e2, e013, -one),
+  scenario("e2 & e032", e2, e032, zero),
+  scenario("e2 & e123", e2, e123, zero),
+
+  scenario("e3 & e021", e3, e021, -one),
+  scenario("e3 & e013", e3, e013, zero),
+  scenario("e3 & e032", e3, e032, zero),
+  scenario("e3 & e123", e3, e123, zero)
+);
+
+auto const trivector_bivector_product = ::testing::Values(
+    scenario("e021 & e01", e021, e01, zero),
+    scenario("e021 & e02", e021, e02, zero),
+    scenario("e021 & e03", e021, e03, -e0),
+    scenario("e021 & e12", e021, e12, zero),
+    scenario("e021 & e31", e021, e31, e1),
+    scenario("e021 & e23", e021, e23, -e2),
+
+    scenario("e013 & e01", e013, e01, zero),
+    scenario("e013 & e02", e013, e02, -e0),
+    scenario("e013 & e03", e013, e03, zero),
+    scenario("e013 & e12", e013, e12, -e1),
+    scenario("e013 & e31", e013, e31, zero),
+    scenario("e013 & e23", e013, e23, e3),
+
+    scenario("e032 & e01", e032, e01, -e0),
+    scenario("e032 & e02", e032, e02, zero),
+    scenario("e032 & e03", e032, e03, zero),
+    scenario("e032 & e12", e032, e12, e2),
+    scenario("e032 & e31", e032, e31, -e3),
+    scenario("e032 & e23", e032, e23, zero),
+
+    scenario("e123 & e01", e123, e01, e1),
+    scenario("e123 & e02", e123, e02, e2),
+    scenario("e123 & e03", e123, e03, e3),
+    scenario("e123 & e12", e123, e12, zero),
+    scenario("e123 & e31", e123, e31, zero),
+    scenario("e123 & e23", e123, e23, zero)
+);
+
+auto const bivector_trivector_product = ::testing::Values(
+    scenario("e01 & e021", e01, e021, zero),
+    scenario("e01 & e013", e01, e013, zero),
+    scenario("e01 & e032", e01, e032, -e0),
+    scenario("e01 & e123", e01, e123, e1),
+
+    scenario("e02 & e021", e02, e021, zero),
+    scenario("e02 & e013", e02, e013, -e0),
+    scenario("e02 & e032", e02, e032, zero),
+    scenario("e02 & e123", e02, e123, e2),
+
+    scenario("e03 & e021", e03, e021, -e0),
+    scenario("e03 & e013", e03, e013, zero),
+    scenario("e03 & e032", e03, e032, zero),
+    scenario("e03 & e123", e03, e123, e3),
+
+    scenario("e12 & e021", e12, e021, zero),
+    scenario("e12 & e013", e12, e013, -e1),
+    scenario("e12 & e032", e12, e032, e2),
+    scenario("e12 & e123", e12, e123, zero),
+
+    scenario("e31 & e021", e31, e021, e1),
+    scenario("e31 & e013", e31, e013, zero),
+    scenario("e31 & e032", e31, e032, -e3),
+    scenario("e31 & e123", e31, e123, zero),
+
+    scenario("e23 & e021", e23, e021, -e2),
+    scenario("e23 & e013", e23, e013, e3),
+    scenario("e23 & e032", e23, e032, zero),
+    scenario("e23 & e123", e23, e123, zero)
+);
+
+auto const antiscalar_product = ::testing::Values(
+    scenario("e0123 & e0", e0123, e0, e0),
+    scenario("e0123 & e1", e0123, e1, e1),
+    scenario("e0123 & e2", e0123, e2, e2),
+    scenario("e0123 & e3", e0123, e3, e3),
+    scenario("e0 & e0123", e0, e0123, e0),
+    scenario("e1 & e0123", e1, e0123, e1),
+    scenario("e2 & e0123", e2, e0123, e2),
+    scenario("e3 & e0123", e3, e0123, e3),
+
+    scenario("e0123 & e01", e0123, e01, e01),
+    scenario("e0123 & e02", e0123, e02, e02),
+    scenario("e0123 & e03", e0123, e03, e03),
+    scenario("e0123 & e12", e0123, e12, e12),
+    scenario("e0123 & e31", e0123, e31, e31),
+    scenario("e0123 & e23", e0123, e23, e23),
+    scenario("e01 & e0123", e01, e0123, e01),
+    scenario("e02 & e0123", e02, e0123, e02),
+    scenario("e03 & e0123", e03, e0123, e03),
+    scenario("e12 & e0123", e12, e0123, e12),
+    scenario("e31 & e0123", e31, e0123, e31),
+    scenario("e23 & e0123", e23, e0123, e23),
+
+    scenario("e0123 & e021", e0123, e021, e021),
+    scenario("e0123 & e013", e0123, e013, e013),
+    scenario("e0123 & e032", e0123, e032, e032),
+    scenario("e0123 & e123", e0123, e123, e123),
+    scenario("e021 & e0123", e021, e0123, e021),
+    scenario("e013 & e0123", e013, e0123, e013),
+    scenario("e032 & e0123", e032, e0123, e032),
+    scenario("e123 & e0123", e123, e0123, e123),
+
+    scenario("e0123 & e0123", e0123, e0123, e0123)
+);
+
+struct RegressiveProductFixture : public ::testing::TestWithParam<scenario> {};
+
+TEST_P(RegressiveProductFixture, RegressiveProduct) {
+    // GIVEN two multivectors
+    auto const [_, lhs, rhs, expected] = GetParam();
+
+    // WHEN we take their regressive product
+    auto const result = lhs & rhs;
+
+    // THEN it will be the product we expect
+    EXPECT_EQ(result, expected);
+}
+
+INSTANTIATE_TEST_SUITE_P(RegressiveProductVector, RegressiveProductFixture, vector_product);
+INSTANTIATE_TEST_SUITE_P(RegressiveProductBivector, RegressiveProductFixture, bivector_product);
+INSTANTIATE_TEST_SUITE_P(RegressiveProductBivectorVector, RegressiveProductFixture, bivector_vector_product);
+INSTANTIATE_TEST_SUITE_P(RegressiveProductVectorBivector, RegressiveProductFixture, vector_bivector_product);
+INSTANTIATE_TEST_SUITE_P(RegressiveProductTrivector, RegressiveProductFixture, trivector_product);
+INSTANTIATE_TEST_SUITE_P(RegressiveProductTrivectorVector, RegressiveProductFixture, trivector_vector_product);
+INSTANTIATE_TEST_SUITE_P(RegressiveProductVectorTrivector, RegressiveProductFixture, vector_trivector_product);
+INSTANTIATE_TEST_SUITE_P(RegressiveProductTrivectorBivector, RegressiveProductFixture, trivector_bivector_product);
+INSTANTIATE_TEST_SUITE_P(RegressiveProductBivectorTrivector, RegressiveProductFixture, bivector_trivector_product);
+INSTANTIATE_TEST_SUITE_P(RegressiveProductAntiscalar, RegressiveProductFixture, antiscalar_product);
+
+}  // namespace regressive_product
+namespace inner_product {
+
+TEST(Multivector, ScalarInner){
+  EXPECT_EQ(one | one, one);
+}
+
+struct scenario {
+    std::string display;
+    multivector lhs;
+    multivector rhs;
+    multivector expected;
+};
+
+std::ostream& operator<<(std::ostream& os, scenario const& s) {
+    return os << s.display;
+}
+
+auto const vector_product = ::testing::Values(
+    scenario{"e0 | e0", e0, e0, zero},
+    scenario{"e0 | e1", e0, e1, zero},
+    scenario{"e0 | e2", e0, e2, zero},
+    scenario{"e0 | e3", e0, e3, zero},
+    scenario{"e1 | e0", e1, e0, zero},
+    scenario{"e1 | e1", e1, e1, one},
+    scenario{"e1 | e2", e1, e2, zero},
+    scenario{"e1 | e3", e1, e3, zero},
+    scenario{"e2 | e0", e2, e0, zero},
+    scenario{"e2 | e1", e2, e1, zero},
+    scenario{"e2 | e2", e2, e2, one},
+    scenario{"e2 | e3", e2, e3, zero},
+    scenario{"e3 | e0", e3, e0, zero},
+    scenario{"e3 | e1", e3, e1, zero},
+    scenario{"e3 | e2", e3, e2, zero},
+    scenario{"e3 | e3", e3, e3, one});
+
+auto const bivector_product = ::testing::Values(
+    scenario{"e01 | e01", e01, e01, zero},
+    scenario{"e01 | e02", e01, e02, zero},
+    scenario{"e01 | e03", e01, e03, zero},
+    scenario{"e01 | e12", e01, e12, zero},
+    scenario{"e01 | e31", e01, e31, zero},
+    scenario{"e01 | e23", e01, e23, zero},
+
+    scenario{"e02 | e01", e02, e01, zero},
+    scenario{"e02 | e02", e02, e02, zero},
+    scenario{"e02 | e03", e02, e03, zero},
+    scenario{"e02 | e12", e02, e12, zero},
+    scenario{"e02 | e31", e02, e31, zero},
+    scenario{"e02 | e23", e02, e23, zero},
+
+    scenario{"e03 | e01", e03, e01, zero},
+    scenario{"e03 | e02", e03, e02, zero},
+    scenario{"e03 | e03", e03, e03, zero},
+    scenario{"e03 | e12", e03, e12, zero},
+    scenario{"e03 | e31", e03, e31, zero},
+    scenario{"e03 | e23", e03, e23, zero},
+
+    scenario{"e12 | e01", e12, e01, zero},
+    scenario{"e12 | e02", e12, e02, zero},
+    scenario{"e12 | e03", e12, e03, zero},
+    scenario{"e12 | e12", e12, e12, -one},
+    scenario{"e12 | e31", e12, e31, zero},
+    scenario{"e12 | e23", e12, e23, zero},
+
+    scenario{"e23 | e01", e23, e01, zero},
+    scenario{"e23 | e02", e23, e02, zero},
+    scenario{"e23 | e03", e23, e03, zero},
+    scenario{"e23 | e12", e23, e12, zero},
+    scenario{"e23 | e31", e23, e31, zero},
+    scenario{"e23 | e23", e23, e23, -one},
+
+    scenario{"e31 | e01", e31, e01, zero},
+    scenario{"e31 | e02", e31, e02, zero},
+    scenario{"e31 | e03", e31, e03, zero},
+    scenario{"e31 | e12", e31, e12, zero},
+    scenario{"e31 | e31", e31, e31, -one},
+    scenario{"e31 | e23", e31, e23, zero});
+
+auto const bivector_vector_product = ::testing::Values(
+    scenario{"e01 | e0", e01, e0, zero},
+    scenario{"e01 | e1", e01, e1, e0},
+    scenario{"e01 | e2", e01, e2, zero},
+    scenario{"e01 | e3", e01, e3, zero},
+
+    scenario{"e02 | e0", e02, e0, zero},
+    scenario{"e02 | e1", e02, e1, zero},
+    scenario{"e02 | e2", e02, e2, e0},
+    scenario{"e02 | e3", e02, e3, zero},
+
+    scenario{"e03 | e0", e03, e0, zero},
+    scenario{"e03 | e1", e03, e1, zero},
+    scenario{"e03 | e2", e03, e2, zero},
+    scenario{"e03 | e3", e03, e3, e0},
+
+    scenario{"e12 | e0", e12, e0, zero},
+    scenario{"e12 | e1", e12, e1, -e2},
+    scenario{"e12 | e2", e12, e2, e1},
+    scenario{"e12 | e3", e12, e3, zero},
+
+    scenario{"e31 | e0", e31, e0, zero},
+    scenario{"e31 | e1", e31, e1, e3},
+    scenario{"e31 | e2", e31, e2, zero},
+    scenario{"e31 | e3", e31, e3, -e1},
+
+    scenario{"e23 | e0", e23, e0, zero},
+    scenario{"e23 | e1", e23, e1, zero},
+    scenario{"e23 | e2", e23, e2, -e3},
+    scenario{"e23 | e3", e23, e3, e2});
+
+auto const vector_bivector_product = ::testing::Values(
+    scenario{"e0 | e01", e0, e01, zero},
+    scenario{"e0 | e02", e0, e02, zero},
+    scenario{"e0 | e03", e0, e03, zero},
+    scenario{"e0 | e12", e0, e12, zero},
+    scenario{"e0 | e31", e0, e31, zero},
+    scenario{"e0 | e23", e0, e23, zero},
+
+    scenario{"e1 | e01", e1, e01, -e0},
+    scenario{"e1 | e02", e1, e02, zero},
+    scenario{"e1 | e03", e1, e03, zero},
+    scenario{"e1 | e12", e1, e12, e2},
+    scenario{"e1 | e31", e1, e31, -e3},
+    scenario{"e1 | e23", e1, e23, zero},
+
+    scenario{"e2 | e01", e2, e01, zero},
+    scenario{"e2 | e02", e2, e02, -e0},
+    scenario{"e2 | e03", e2, e03, zero},
+    scenario{"e2 | e12", e2, e12, -e1},
+    scenario{"e2 | e31", e2, e31, zero},
+    scenario{"e2 | e23", e2, e23, e3},
+
+    scenario{"e3 | e01", e3, e01, zero},
+    scenario{"e3 | e02", e3, e02, zero},
+    scenario{"e3 | e03", e3, e03, -e0},
+    scenario{"e3 | e12", e3, e12, zero},
+    scenario{"e3 | e31", e3, e31, e1},
+    scenario{"e3 | e23", e3, e23, -e2});
+
+auto const trivector_product = ::testing::Values(
+    scenario("e021 | e021", e021, e021, zero),
+    scenario("e021 | e013", e021, e013, zero),
+    scenario("e021 | e032", e021, e032, zero),
+    scenario("e021 | e123", e021, e123, zero),
+
+    scenario("e013 | e021", e013, e021, zero),
+    scenario("e013 | e013", e013, e013, zero),
+    scenario("e013 | e032", e013, e032, zero),
+    scenario("e013 | e123", e013, e123, zero),
+
+    scenario("e032 | e021", e032, e021, zero),
+    scenario("e032 | e013", e032, e013, zero),
+    scenario("e032 | e032", e032, e032, zero),
+    scenario("e032 | e123", e032, e123, zero),
+
+    scenario("e123 | e021", e123, e021, zero),
+    scenario("e123 | e013", e123, e013, zero),
+    scenario("e123 | e032", e123, e032, zero),
+    scenario("e123 | e123", e123, e123, -one)
+);
+
+auto const trivector_vector_product = ::testing::Values(
+    scenario("e021 | e0", e021, e0, zero),
+    scenario("e021 | e1", e021, e1, e02),
+    scenario("e021 | e2", e021, e2, -e01),
+    scenario("e021 | e3", e021, e3, zero),
+
+    scenario("e013 | e0", e013, e0, zero),
+    scenario("e013 | e1", e013, e1, -e03),
+    scenario("e013 | e2", e013, e2, zero),
+    scenario("e013 | e3", e013, e3, e01),
+
+    scenario("e032 | e0", e032, e0, zero),
+    scenario("e032 | e1", e032, e1, zero),
+    scenario("e032 | e2", e032, e2, e03),
+    scenario("e032 | e3", e032, e3, -e02),
+
+    scenario("e123 | e0", e123, e0, zero),
+    scenario("e123 | e1", e123, e1, e23),
+    scenario("e123 | e2", e123, e2, e31),
+    scenario("e123 | e3", e123, e3, e12)
+);
+
+auto const vector_trivector_product = ::testing::Values(
+  scenario("e0 | e021", e0, e021, zero),
+  scenario("e0 | e013", e0, e013, zero),
+  scenario("e0 | e032", e0, e032, zero),
+  scenario("e0 | e123", e0, e123, zero),
+
+  scenario("e1 | e021", e1, e021, e02),
+  scenario("e1 | e013", e1, e013, -e03),
+  scenario("e1 | e032", e1, e032, zero),
+  scenario("e1 | e123", e1, e123, e23),
+
+  scenario("e2 | e021", e2, e021, -e01),
+  scenario("e2 | e013", e2, e013, zero),
+  scenario("e2 | e032", e2, e032, e03),
+  scenario("e2 | e123", e2, e123, e31),
+
+  scenario("e3 | e021", e3, e021, zero),
+  scenario("e3 | e013", e3, e013, e01),
+  scenario("e3 | e032", e3, e032, -e02),
+  scenario("e3 | e123", e3, e123, e12)
+);
+
+auto const trivector_bivector_product = ::testing::Values(
+    scenario("e021 | e01", e021, e01, zero),
+    scenario("e021 | e02", e021, e02, zero),
+    scenario("e021 | e03", e021, e03, zero),
+    scenario("e021 | e12", e021, e12, e0),
+    scenario("e021 | e31", e021, e31, zero),
+    scenario("e021 | e23", e021, e23, zero),
+
+    scenario("e013 | e01", e013, e01, zero),
+    scenario("e013 | e02", e013, e02, zero),
+    scenario("e013 | e03", e013, e03, zero),
+    scenario("e013 | e12", e013, e12, zero),
+    scenario("e013 | e31", e013, e31, e0),
+    scenario("e013 | e23", e013, e23, zero),
+
+    scenario("e032 | e01", e032, e01, zero),
+    scenario("e032 | e02", e032, e02, zero),
+    scenario("e032 | e03", e032, e03, zero),
+    scenario("e032 | e12", e032, e12, zero),
+    scenario("e032 | e31", e032, e31, zero),
+    scenario("e032 | e23", e032, e23, e0),
+
+    scenario("e123 | e01", e123, e01, zero),
+    scenario("e123 | e02", e123, e02, zero),
+    scenario("e123 | e03", e123, e03, zero),
+    scenario("e123 | e12", e123, e12, -e3),
+    scenario("e123 | e31", e123, e31, -e2),
+    scenario("e123 | e23", e123, e23, -e1)
+);
+
+auto const bivector_trivector_product = ::testing::Values(
+    scenario("e01 | e021", e01, e021, zero),
+    scenario("e01 | e013", e01, e013, zero),
+    scenario("e01 | e032", e01, e032, zero),
+    scenario("e01 | e123", e01, e123, zero),
+
+    scenario("e02 | e021", e02, e021, zero),
+    scenario("e02 | e013", e02, e013, zero),
+    scenario("e02 | e032", e02, e032, zero),
+    scenario("e02 | e123", e02, e123, zero),
+
+    scenario("e03 | e021", e03, e021, zero),
+    scenario("e03 | e013", e03, e013, zero),
+    scenario("e03 | e032", e03, e032, zero),
+    scenario("e03 | e123", e03, e123, zero),
+
+    scenario("e12 | e021", e12, e021, e0),
+    scenario("e12 | e013", e12, e013, zero),
+    scenario("e12 | e032", e12, e032, zero),
+    scenario("e12 | e123", e12, e123, -e3),
+
+    scenario("e31 | e021", e31, e021, zero),
+    scenario("e31 | e013", e31, e013, e0),
+    scenario("e31 | e032", e31, e032, zero),
+    scenario("e31 | e123", e31, e123, -e2),
+
+    scenario("e23 | e021", e23, e021, zero),
+    scenario("e23 | e013", e23, e013, zero),
+    scenario("e23 | e032", e23, e032, e0),
+    scenario("e23 | e123", e23, e123, -e1)
+);
+
+auto const antiscalar_product = ::testing::Values(
+    scenario("e0123 | e0", e0123, e0, zero),
+    scenario("e0123 | e1", e0123, e1, -e032),
+    scenario("e0123 | e2", e0123, e2, -e013),
+    scenario("e0123 | e3", e0123, e3, -e021),
+    scenario("e0 | e0123", e0, e0123, zero),
+    scenario("e1 | e0123", e1, e0123, e032),
+    scenario("e2 | e0123", e2, e0123, e013),
+    scenario("e3 | e0123", e3, e0123, e021),
+
+    scenario("e0123 | e01", e0123, e01, zero),
+    scenario("e0123 | e02", e0123, e02, zero),
+    scenario("e0123 | e03", e0123, e03, zero),
+    scenario("e0123 | e12", e0123, e12, -e03),
+    scenario("e0123 | e31", e0123, e31, -e02),
+    scenario("e0123 | e23", e0123, e23, -e01),
+    scenario("e01 | e0123", e01, e0123, zero),
+    scenario("e02 | e0123", e02, e0123, zero),
+    scenario("e03 | e0123", e03, e0123, zero),
+    scenario("e12 | e0123", e12, e0123, -e03),
+    scenario("e31 | e0123", e31, e0123, -e02),
+    scenario("e23 | e0123", e23, e0123, -e01),
+
+    scenario("e0123 | e021", e0123, e021, zero),
+    scenario("e0123 | e013", e0123, e013, zero),
+    scenario("e0123 | e032", e0123, e032, zero),
+    scenario("e0123 | e123", e0123, e123, -e0),
+    scenario("e021 | e0123", e021, e0123, zero),
+    scenario("e013 | e0123", e013, e0123, zero),
+    scenario("e032 | e0123", e032, e0123, zero),
+    scenario("e123 | e0123", e123, e0123, e0),
+
+    scenario("e0123 | e0123", e0123, e0123, zero)
+);
+
+struct InnerProductFixture : public ::testing::TestWithParam<scenario> {};
+
+TEST_P(InnerProductFixture, InnerProduct) {
+    // GIVEN two multivectors
+    auto const [_, lhs, rhs, expected] = GetParam();
+
+    // WHEN we take their inner product
+    auto const result = lhs | rhs;
+
+    // THEN it will be the product we expect
+    EXPECT_EQ(result, expected);
+}
+
+INSTANTIATE_TEST_SUITE_P(InnerProductVector, InnerProductFixture, vector_product);
+INSTANTIATE_TEST_SUITE_P(InnerProductBivector, InnerProductFixture, bivector_product);
+INSTANTIATE_TEST_SUITE_P(InnerProductBivectorVector, InnerProductFixture, bivector_vector_product);
+INSTANTIATE_TEST_SUITE_P(InnerProductVectorBivector, InnerProductFixture, vector_bivector_product);
+INSTANTIATE_TEST_SUITE_P(InnerProductTrivector, InnerProductFixture, trivector_product);
+INSTANTIATE_TEST_SUITE_P(InnerProductTrivectorVector, InnerProductFixture, trivector_vector_product);
+INSTANTIATE_TEST_SUITE_P(InnerProductVectorTrivector, InnerProductFixture, vector_trivector_product);
+INSTANTIATE_TEST_SUITE_P(InnerProductTrivectorBivector, InnerProductFixture, trivector_bivector_product);
+INSTANTIATE_TEST_SUITE_P(InnerProductBivectorTrivector, InnerProductFixture, bivector_trivector_product);
+INSTANTIATE_TEST_SUITE_P(InnerProductAntiscalar, InnerProductFixture, antiscalar_product);
+
+}  // namespace inner_product
+} // namespace pga

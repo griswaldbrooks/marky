@@ -529,7 +529,7 @@ constexpr multivector operator-(multivector const& a) {
   res[15] = a[15];
   return res;
 };
-
+// TODO: Add namespace blade/blades for these constants
 // Define the basis blades
 static constexpr auto zero = multivector{};
 static constexpr auto one = make_scalar(1.);
