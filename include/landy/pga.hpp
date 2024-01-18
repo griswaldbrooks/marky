@@ -34,7 +34,7 @@ using namespace std::numbers;
 //   std::array<double, 16> elements_ = {};
 // };
 //
-using multivector = std::array<double, 16>;
+struct multivector : public std::array<double, 16> {};
 
 constexpr multivector make_scalar(double value) {
   multivector result;
@@ -376,6 +376,7 @@ constexpr multivector operator*(multivector const& a, multivector const& b) {
   return res;
 };
 
+
 //***********************
 // multivector.smul : res = a * b
 // scalar/multivector multiplication
@@ -401,6 +402,9 @@ constexpr multivector operator*(multivector const& a, multivector const& b) {
   return res;
 };
 
+constexpr multivector operator-(multivector const& a) {
+ return -1 * a;
+};
 //***********************
 // multivector.muls : res = a * b
 // multivector/scalar multiplication

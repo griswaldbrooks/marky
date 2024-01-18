@@ -110,7 +110,7 @@ TEST(Multivector, ScalarAddition) {
     12., 13., 14., 15.,// trivector
     16.}; // pseudoscalar
 
-  auto const expected = multivector{2., // scalar 
+  auto const expected = multivector{2., // scalar
     2., 3., 4., 5., // vector
     6., 7., 8., 9., 10., 11.,// bivector
     12., 13., 14., 15.,// trivector
@@ -125,7 +125,7 @@ TEST(Multivector, ScalarSubtraction){
     12., 13., 14., 15.,// trivector
     16.}; // pseudoscalar
 
-  auto const expected = multivector{0., // scalar 
+  auto const expected = multivector{0., // scalar
     2., 3., 4., 5., // vector
     6., 7., 8., 9., 10., 11.,// bivector
     12., 13., 14., 15.,// trivector
@@ -140,7 +140,7 @@ TEST(Multivector, ScalarMultiplication){
     12., 13., 14., 15.,// trivector
     16.}; // pseudoscalar
 
-  auto const expected = multivector{2., // scalar 
+  auto const expected = multivector{2., // scalar
     4., 6., 8., 10., // vector
     12., 14., 16., 18., 20., 22.,// bivector
     24., 26., 28., 30.,// trivector
@@ -149,6 +149,10 @@ TEST(Multivector, ScalarMultiplication){
 }
 
 namespace geometric_product{
+
+TEST(Multivector, ScalarProduct){
+  EXPECT_EQ(one * one, one);
+}
 
 struct scenario {
     std::string display;
@@ -161,27 +165,80 @@ std::ostream& operator<<(std::ostream& os, scenario const& s) {
     return os << s.display;
 }
 
-auto const scenarios = ::testing::Values(
-    scenario{"1 * 1", one, one, one},
-    scenario{"e0123 * e0123", e0123, e0123, zero});
+auto const vector_product = ::testing::Values(
+    scenario{"e0 * e0", e0, e0, zero},
+    scenario{"e0 * e1", e0, e1, e01},
+    scenario{"e0 * e2", e0, e2, e02},
+    scenario{"e0 * e3", e0, e3, e03},
+    scenario{"e1 * e0", e1, e0, -e01},
+    scenario{"e1 * e1", e1, e1, one},
+    scenario{"e1 * e2", e1, e2, e12},
+    scenario{"e1 * e3", e1, e3, -e31},
+    scenario{"e2 * e0", e2, e0, -e02},
+    scenario{"e2 * e1", e2, e1, -e12},
+    scenario{"e2 * e2", e2, e2, one},
+    scenario{"e2 * e3", e2, e3, e23},
+    scenario{"e3 * e0", e3, e0, -e03},
+    scenario{"e3 * e1", e3, e1, e31},
+    scenario{"e3 * e2", e3, e2, -e23},
+    scenario{"e3 * e3", e3, e3, one});
+
+auto const bivector_product = ::testing::Values(
+    scenario{"e01 * e01", e01, e01, zero},
+    scenario{"e01 * e02", e01, e02, zero},
+    scenario{"e01 * e03", e01, e03, zero},
+    scenario{"e01 * e12", e01, e12, e02},
+    scenario{"e01 * e23", e01, e23, e0123},
+    scenario{"e01 * e31", e01, e31, -e03},
+    scenario{"e02 * e01", e02, e01, zero},
+    scenario{"e02 * e02", e02, e02, zero},
+    scenario{"e02 * e03", e02, e03, zero},
+    scenario{"e02 * e12", e02, e12, -e01},
+    scenario{"e02 * e23", e02, e23, e03},
+    scenario{"e02 * e31", e02, e31, e0123},
+    scenario{"e03 * e01", e03, e01, zero},
+    scenario{"e03 * e02", e03, e02, zero},
+    scenario{"e03 * e03", e03, e03, zero},
+    scenario{"e03 * e12", e03, e12, e0123},
+    scenario{"e03 * e23", e03, e23, -e02},
+    scenario{"e03 * e31", e03, e31, e01},
+    scenario{"e12 * e01", e12, e01, -e02},
+    scenario{"e12 * e02", e12, e02, e01},
+    scenario{"e12 * e03", e12, e03, e0123},
+    scenario{"e12 * e12", e12, e12, -one},
+    scenario{"e12 * e23", e12, e23, -e31},
+    scenario{"e12 * e31", e12, e31, e23},
+    scenario{"e23 * e01", e23, e01, e0123},
+    scenario{"e23 * e02", e23, e02, -e03},
+    scenario{"e23 * e03", e23, e03, e02},
+    scenario{"e23 * e12", e23, e12, e31},
+    scenario{"e23 * e23", e23, e23, -one},
+    scenario{"e23 * e31", e23, e31, -e12},
+    scenario{"e31 * e01", e31, e01, e03},
+    scenario{"e31 * e02", e31, e02, e0123},
+    scenario{"e31 * e03", e31, e03, -e01},
+    scenario{"e31 * e12", e31, e12, -e23},
+    scenario{"e31 * e23", e31, e23, e12},
+    scenario{"e31 * e31", e31, e31, -one});
 
 struct GeometricProductFixture : public ::testing::TestWithParam<scenario> {};
 
 TEST_P(GeometricProductFixture, GeometricProduct) {
-    // GIVEN two multivectors 
+    // GIVEN two multivectors
     auto const [_, lhs, rhs, expected] = GetParam();
 
     // WHEN we take their geometric product
-    auto const result = lhs * rhs; 
+    auto const result = lhs * rhs;
 
     // THEN it will be the product we expect
     EXPECT_EQ(result, expected);
 }
 
-// associates test and scenario as each can be reused
-// values can also be automatically generated or combined
-// http://google.github.io/googletest/reference/testing.html#INSTANTIATE_TEST_SUITE_P
-INSTANTIATE_TEST_SUITE_P(GeometricProductGroup, GeometricProductFixture, scenarios);
+INSTANTIATE_TEST_SUITE_P(GeometricProductVector, GeometricProductFixture, vector_product);
+INSTANTIATE_TEST_SUITE_P(GeometricProductBivector, GeometricProductFixture, bivector_product);
 
-}  // namespace test_transitions
+TEST(Multivector, AntiScalarProduct){
+  EXPECT_EQ(e0123 * e0123, zero);
+}
+}  // namespace geometric_product
 } // namespace landy::pga
