@@ -9,7 +9,9 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN --mount=type=cache,target=/var/cache/apt,id=apt \
   apt-get update -y && apt-get install -q -y --no-install-recommends \
   build-essential        \
+  ca-certificates        \
   cmake                  \
+  git                    \
   lsb-core               \
   wget                   \
   && rm -rf /var/lib/apt/lists/*
@@ -38,7 +40,6 @@ RUN --mount=type=cache,target=/var/cache/apt,id=apt \
   apt-get update && apt-get upgrade -y \
   && apt-get install -q -y --no-install-recommends \
   clang-format \
-  git \
   inkscape \
   neovim \
   python3 \
