@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <span>
-#include "landy/landy.hpp"
+#include "marky/marky.hpp"
 #include "mp-units/systems/si/si.h"
 #include "mp-units/systems/isq/isq.h"
 #include <mp-units/customization_points.h>
@@ -22,7 +22,7 @@ using point_t = std::array<double, 3>;
 //   return make_quantity<R>(rep);
 // }
 //
-namespace landy::geometry {
+namespace marky::geometry {
 
 // TEST(Norm, Norm){
 //   auto const point = point_t{0., 1.1, 2.2} * isq::position_vector[m];
@@ -111,4 +111,4 @@ namespace landy::geometry {
 //   auto const mp = midpoint(a, b);
 //   EXPECT_FALSE(mp.has_value());
 // }
-} // namespace landy::geometry
+} // namespace marky::geometry

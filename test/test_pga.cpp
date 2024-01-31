@@ -2,7 +2,7 @@
 #include <numeric>
 #include <ostream>
 #include <gtest/gtest.h>
-#include "landy/pga.hpp"
+#include "marky/pga.hpp"
 namespace pga {
 
 TEST(Multivector, ZeroInitialized) {

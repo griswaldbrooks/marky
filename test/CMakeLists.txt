@@ -12,15 +12,15 @@ set_target_properties(gmock_main PROPERTIES EXPORT_COMPILE_COMMANDS OFF)
 
 enable_testing()
 
-add_executable(test_landy
-  test_landy.cpp
+add_executable(test_marky
+  test_marky.cpp
   test_pga.cpp
 )
-target_link_libraries(test_landy PRIVATE
+target_link_libraries(test_marky PRIVATE
   GTest::gtest_main
   GTest::gmock_main
-  landy::landy
+  marky::marky
 )
 
 include(GoogleTest)
-gtest_discover_tests(test_landy)
+gtest_discover_tests(test_marky)

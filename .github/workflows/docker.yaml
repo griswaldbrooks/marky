@@ -57,7 +57,7 @@ jobs:
           file: Dockerfile
           push: true
           target: upstream
-          tags: ghcr.io/griswaldbrooks/landy:upstream
+          tags: ghcr.io/griswaldbrooks/marky:upstream
           cache-from: type=gha
           cache-to: type=gha,mode=max
   development:
@@ -85,6 +85,6 @@ jobs:
             USER=ci-user
             UID=1000
             GID=1000
-          tags: ghcr.io/griswaldbrooks/landy:ci-user-development
+          tags: ghcr.io/griswaldbrooks/marky:ci-user-development
           cache-from: type=gha
           cache-to: type=gha,mode=max

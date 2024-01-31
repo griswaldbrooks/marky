@@ -1,4 +1,4 @@
-#include "landy/pga.hpp"
+#include "marky/pga.hpp"
 #include <iostream>
 #include <benchmark/benchmark.h>
 #include <random>
@@ -39,6 +39,6 @@ static void midpoint_benchmark(benchmark::State& state) {
 }
 // Register the function as a benchmark
 BENCHMARK(midpoint_benchmark);
-}  // namespace landy::pga
+}  // namespace marky::pga
 // Run the benchmark
 BENCHMARK_MAIN();

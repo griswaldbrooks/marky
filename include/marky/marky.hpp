@@ -11,7 +11,7 @@ using namespace mp_units;
 using namespace::si::unit_symbols;
 using namespace std::numbers;
 
-namespace landy::geometry {
+namespace marky::geometry {
 
 template <typename T>
 [[nodiscard]] bool is_near(T const& lhs, T const& rhs, T const& tolerance = 1e-6) {
