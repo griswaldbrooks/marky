@@ -19,7 +19,7 @@ jobs:
     container: ghcr.io/griswaldbrooks/marky:upstream
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Configure
       run: cmake -B build -DBUILD_SHARED_LIBS=${{matrix.type.flags}} -DCMAKE_BUILD_TYPE=${{matrix.config.name}}
@@ -29,3 +29,24 @@ jobs:
 
     - name: Test
       run: ctest --test-dir build --output-on-failure --build-config ${{matrix.config.name}}
+
+    - name: Benchmark
+      run: ./build/benchmarks/benchmark_geometry --benchmark_format=json | tee benchmark_result.json
+ 
+    - name: Download previous benchmark data
+      uses: actions/cache@v4
+      with:
+        path: ./cache
+        key: ${{ runner.os }}-benchmark
+  
+    - name: Store benchmark result
+      uses: benchmark-action/github-action-benchmark@v1
+      with:
+        tool: 'googlecpp'
+        output-file-path: benchmark_result.json
+        external-data-json-path: ./cache/benchmark-data.json
+        fail-on-alert: true
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        comment-on-alert: true
+        summary-always: true
+        alert-comment-cc-users: '@griswaldbrooks'
