@@ -54,8 +54,7 @@ RUN wget -q -O /bin/hadolint https://github.com/hadolint/hadolint/releases/downl
 # install google benchmark
 WORKDIR /opt
 RUN git clone --depth 1 https://github.com/google/benchmark.git \
-  && cd benchmark \
-  && cmake -DCMAKE_BUILD_TYPE=Release -DBENCHMARK_ENABLE_GTEST_TESTS=OFF -S . -B "build" \
+  && cmake -DCMAKE_BUILD_TYPE=Release -DBENCHMARK_ENABLE_GTEST_TESTS=OFF -S "benchmark/" -B "build" \
   && cmake --build "build" --config Release --target install
 
 # Setup user home directory
