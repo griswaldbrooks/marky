@@ -14,6 +14,12 @@ RUN --mount=type=cache,target=/var/cache/apt,id=apt \
   wget                   \
   && rm -rf /var/lib/apt/lists/*
 
+# install google benchmark
+WORKDIR /opt
+RUN git clone --depth 1 https://github.com/google/benchmark.git \
+  && cmake -DCMAKE_BUILD_TYPE=Release -DBENCHMARK_ENABLE_GTEST_TESTS=OFF -S "benchmark/" -B "build" \
+  && cmake --build "build" --config Release --target install
+
 FROM upstream AS development
 
 ARG UID
@@ -50,12 +56,6 @@ RUN python3 -m pip install --no-cache-dir \
 # install hadolint
 RUN wget -q -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-Linux-x86_64 \
   && chmod +x /bin/hadolint
-
-# install google benchmark
-WORKDIR /opt
-RUN git clone --depth 1 https://github.com/google/benchmark.git \
-  && cmake -DCMAKE_BUILD_TYPE=Release -DBENCHMARK_ENABLE_GTEST_TESTS=OFF -S "benchmark/" -B "build" \
-  && cmake --build "build" --config Release --target install
 
 # Setup user home directory
 # --no-log-init helps with excessively long UIDs
