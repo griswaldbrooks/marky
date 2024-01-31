@@ -1,25 +1,22 @@
-name: CI
+name: ci
 
 on: [push, pull_request, workflow_dispatch]
 
 jobs:
   build:
-    name: ${{matrix.platform.name}} ${{matrix.type.name}} ${{matrix.config.name}}
-    runs-on: ${{matrix.platform.os}}
+    name: ${{matrix.type.name}} ${{matrix.config.name}}
+    runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
-        platform:
-        - { name: Linux,   os: ubuntu-latest }
-        - { name: macOS,   os: macos-latest }
         type:
         - { name: Shared, flags: "ON" }
         - { name: Static, flags: "OFF" }
         config:
         - { name: Debug }
         - { name: Release }
-
+    container: ghcr.io/griswaldbrooks/marky:upstream
     steps:
     - name: Checkout
       uses: actions/checkout@v3
