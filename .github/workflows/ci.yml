@@ -17,13 +17,13 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
     - name: Cache ccache
-        uses: pat-s/always-upload-cache@v3
-        with:
-          path: ${{ env.CCACHE_DIR }}
-          key: ccache-cmake-${{ matrix.preset }}-${{ github.sha }}-${{ github.run_id }}
-          restore-keys: |
-            ccache-cmake-${{ matrix.preset }}-${{ github.sha }}
-            ccache-cmake-${{ matrix.preset }}
+      uses: pat-s/always-upload-cache@v3
+      with:
+        path: ${{ env.CCACHE_DIR }}
+        key: ccache-cmake-${{ matrix.preset }}-${{ github.sha }}-${{ github.run_id }}
+        restore-keys: |
+          ccache-cmake-${{ matrix.preset }}-${{ github.sha }}
+          ccache-cmake-${{ matrix.preset }}
     - name: Configure
       run: cmake --preset ${{ matrix.preset }} 
 
