@@ -46,7 +46,7 @@
             "name": "coverage",
             "inherits": "debug",
             "displayName": "Code coverage reporting",
-            "binaryDir": "${sourceDir}/build/codecov",
+            "binaryDir": "${sourceDir}/build/coverage",
             "cacheVariables": {
                 "CMAKE_CXX_FLAGS": "--coverage"
             }
