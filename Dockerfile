@@ -10,9 +10,12 @@ RUN --mount=type=cache,target=/var/cache/apt,id=apt \
   apt-get update -y && apt-get install -q -y --no-install-recommends \
   build-essential        \
   ca-certificates        \
+  ccache                 \
   cmake                  \
   git                    \
+  lld                    \
   lsb-core               \
+  ninja-build            \
   wget                   \
   && rm -rf /var/lib/apt/lists/*
 
