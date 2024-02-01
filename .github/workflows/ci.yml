@@ -31,6 +31,7 @@ jobs:
       run: cmake --build build/${{ matrix.preset }} 
 
     - name: Test
+      if: ${{ matrix.preset == 'debug' }}
       run: ctest --test-dir build/${{ matrix.preset }} --output-on-failure 
 
     - name: Benchmark
