@@ -56,3 +56,12 @@ jobs:
         comment-on-alert: true
         summary-always: true
         alert-comment-cc-users: '@griswaldbrooks'
+
+    - name: Generate a code coverage report
+      if: ${{ matrix.preset == 'coverage' }}
+      uses: threeal/gcovr-action@v1
+        with:
+          excludes: |
+            thirdparty/*
+          coveralls-send: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
