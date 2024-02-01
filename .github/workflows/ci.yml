@@ -31,7 +31,6 @@ jobs:
       run: cmake --build build/${{ matrix.preset }} 
 
     - name: Test
-      if: ${{ matrix.preset == 'debug' }}
       run: ctest --test-dir build/${{ matrix.preset }} --output-on-failure 
 
     - name: Benchmark
@@ -63,6 +62,9 @@ jobs:
       uses: threeal/gcovr-action@v1
       with:
         excludes: |
-          thirdparty/*
+          benchmarks/*
+          build/*
+          test/*
+          third_party/*
         coveralls-send: true
         github-token: ${{ secrets.GITHUB_TOKEN }}

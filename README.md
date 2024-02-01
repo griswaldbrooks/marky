@@ -1,3 +1,6 @@
+[![ci](https://github.com/griswaldbrooks/marky/actions/workflows/ci.yml/badge.svg)](https://github.com/griswaldbrooks/marky/actions/workflows/ci.yml)
+[![docker](https://github.com/griswaldbrooks/marky/actions/workflows/docker.yaml/badge.svg)](https://github.com/griswaldbrooks/marky/actions/workflows/docker.yaml)
+[![Coverage Status](https://coveralls.io/repos/github/griswaldbrooks/marky/badge.svg?branch=)](https://coveralls.io/github/griswaldbrooks/marky?branch=)
 # marky
 Landmark based localization library
 
