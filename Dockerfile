@@ -16,6 +16,8 @@ RUN --mount=type=cache,target=/var/cache/apt,id=apt \
   lld                    \
   lsb-core               \
   ninja-build            \
+  python3                \
+  python3-pip            \
   wget                   \
   && rm -rf /var/lib/apt/lists/*
 
@@ -45,8 +47,6 @@ RUN --mount=type=cache,target=/var/cache/apt,id=apt \
   clang-format \
   inkscape \
   neovim \
-  python3 \
-  python3-pip \
   sudo \
   ssh \
   vim \
