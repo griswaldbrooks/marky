@@ -34,7 +34,8 @@ jobs:
       run: ctest --test-dir build/${{ matrix.preset }} --output-on-failure 
 
     - name: Benchmark
-      run: ./build/benchmarks/benchmark_geometry --benchmark_format=json | tee benchmark_result.json
+      if: ${{ matrix.preset == 'release' }}
+      run: ./build/${{ matrix.preset }}/benchmarks/benchmark_geometry --benchmark_format=json | tee benchmark_result.json
  
     - name: Download previous benchmark data
       uses: actions/cache@v4
