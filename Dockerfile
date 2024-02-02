@@ -12,6 +12,7 @@ RUN --mount=type=cache,target=/var/cache/apt,id=apt \
   ca-certificates        \
   ccache                 \
   cmake                  \
+  curl                   \
   git                    \
   lcov                   \
   lld                    \
