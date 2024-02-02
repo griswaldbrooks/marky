@@ -13,6 +13,7 @@ RUN --mount=type=cache,target=/var/cache/apt,id=apt \
   ccache                 \
   cmake                  \
   git                    \
+  lcov                   \
   lld                    \
   lsb-core               \
   ninja-build            \

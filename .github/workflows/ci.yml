@@ -59,12 +59,10 @@ jobs:
 
     - name: Generate a code coverage report
       if: ${{ matrix.preset == 'coverage' }}
-      uses: threeal/gcovr-action@v1
+      run: lcov -c -d . -o coverage.info --exclude "*/third_party/*"
+    - name: Upload coverage to Coveralls
+      uses: coverallsapp/github-action$v2
       with:
-        excludes: |
-          benchmarks/*
-          build/*
-          test/*
-          third_party/*
-        coveralls-send: true
         github-token: ${{ secrets.GITHUB_TOKEN }}
+        fail-on-error: true 
+        files: coverage.info
