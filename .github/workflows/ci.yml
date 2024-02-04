@@ -59,7 +59,7 @@ jobs:
 
     - name: Generate a code coverage report
       if: ${{ matrix.preset == 'coverage' }}
-      run: lcov -c -d . -o coverage.info --exclude "*/third_party/*"
+      run: lcov -c -d . -o coverage.info --exclude "*/third_party/*" "*/test/*" "*/build/*" "*/usr/*"
     - name: Upload coverage to Coveralls
       if: ${{ matrix.preset == 'coverage' }}
       uses: coverallsapp/github-action@v2
