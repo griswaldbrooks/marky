@@ -67,3 +67,4 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         fail-on-error: true 
         files: coverage.info
+        format: lcov

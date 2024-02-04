@@ -33,3 +33,6 @@
 
 # build artifacts
 build/
+
+# coverage artifacts
+coverage.info
