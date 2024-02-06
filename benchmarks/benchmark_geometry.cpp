@@ -26,7 +26,7 @@ multivector midpoint(multivector const& a, multivector const& b) {
   // project the meet onto the first line 
   auto const m1 = (m | a) ^ a;
   // project the meet onto the second line 
-  auto const m2 = (m | b) ^ b;
+  auto const m2 = (m | b) ^ a;
   // find the midpoint of the meetss
   return (m1 + m2) * 0.5;
 }
